@@ -5,6 +5,7 @@ from . import animals_blueprint
 # Importing necessary Flask and SQLAlchemy components
 from flask.views import MethodView
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.inspection import inspect
 
 # Importing your models and schemas
 from .models import Animal  # Import the Animal model
@@ -55,9 +56,11 @@ class AnimalById(MethodView):
         animal = Animal.query.get(animal_id)  # Retrieve an animal by ID
         if not animal:
             return {"message": "Animal not found"}, 404
+        # Get a list of field names for the Animal model
+        field_names = [column.name for column in inspect(Animal).attrs]
         try:
             for key, value in update_data.items():
-                if key not in ['id', 'created_at']:  # Exclude fields that shouldn't be updated
+                if key in field_names and key not in ['id', 'created_at']: # Exclude fields that shouldn't be updated
                     setattr(animal, key, value)
             db.session.commit()  # Commit the session to save the changes
         except SQLAlchemyError as e:

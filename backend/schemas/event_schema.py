@@ -15,8 +15,8 @@ class EventSchema(SQLAlchemyAutoSchema):
     description = auto_field()
     start_at = auto_field()
     end_at = auto_field()
-    created_at = auto_field()
-    updated_at = auto_field()
+    created_at = auto_field()(dump_only=True)
+    updated_at = auto_field()(dump_only=True)
     zoo_id = auto_field()
 
     # Optional: Nested relationships, uncomment if needed
