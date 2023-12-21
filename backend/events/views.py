@@ -15,6 +15,8 @@ from .schemas import EventSchema  # Import the EventSchema for serialization
 # Import the database instance (db) directly
 from backend.app import db
 
+from animals.views import Animals
+
 
 @events_blueprint.route('/')
 class Events(MethodView):
@@ -81,3 +83,79 @@ class EventById(MethodView):
             db.session.rollback()  # Rollback the transaction in case of error
             return {"message": str(e)}, 400  # Return an error message and a 400 status code
         return '', 204  # Return an empty response with a 204 status code
+
+
+    @events_blueprint.route('/<int:event_id>/assign_animals', methods=['POST'])
+    @events_blueprint.arguments(AnimalEventSchema)  # Using AnimalEventSchema for animal assignment
+    @events_blueprint.response(200, EventSchema)
+    def assign_animals(event_id, animal_ids):
+        """
+        Assigns a list of animals to an event.
+        :param event_id: ID of the event to which animals are to be assigned.
+        :param animal_ids: List of animal IDs to be assigned to the event.
+        :return: Updated event data with assigned animals.
+        """
+        # Fetch the event based on event_id
+        event = Event.query.get(event_id)
+        if not event:
+            return {"message": "Event not found"}, 404
+        
+        # Fetch animals based on provided IDs
+        animals = Animal.query.filter(Animal.id.in_(animal_ids)).all()
+        if not animals:
+            return {"message": "No valid animals found for the provided IDs"}, 400
+        
+        try:
+            animal_handler = Animals()  # Instantiate once for all method calls
+            for animal in animals:
+                event.animals.append(animal)
+                # Log this activity
+                animal_handler.log_activity(animal.id, f"Animal assigned to event {event_id}")
+
+            # Update animal status after assignment
+            animal_handler.update_animal_status()
+
+            db.session.commit()  # Save the changes to the database
+            return event
+        except SQLAlchemyError as e:
+            db.session.rollback()  # Roll back in case of any error
+            return {"message": str(e)}, 400
+
+
+
+
+    @events_blueprint.route('/<int:event_id>/remove_animals', methods=['POST'])
+    @events_blueprint.arguments(AnimalEventSchema)  # Reusing AnimalEventSchema
+    @events_blueprint.response(200, EventSchema)
+    def remove_animals(event_id, animal_ids):
+        """
+        Removes a list of animals from an event.
+        :param event_id: ID of the event from which animals are to be removed.
+        :param animal_ids: List of animal IDs to be removed from the event.
+        :return: Updated event data without the removed animals.
+        """
+        # Fetch the event based on event_id
+        event = Event.query.get(event_id)
+        if not event:
+            return {"message": "Event not found"}, 404
+
+        animals = Animal.query.filter(Animal.id.in_(animal_ids)).all()
+        if not animals:
+            return {"message": "No valid animals found for the provided IDs"}, 400
+
+        try:
+            animal_handler = Animals()  # Instantiate the Animals class for logging
+
+            # Remove each animal from the event and log the activity
+            for animal in animals:
+                event.animals.remove(animal)
+                animal_handler.log_activity(animal.id, f"Animal removed from event {event_id}")
+
+            # Update animal status after removal
+            animal_handler.update_animal_status()
+
+            db.session.commit()  # Save the changes to the database
+            return event
+        except SQLAlchemyError as e:
+            db.session.rollback()  # Roll back in case of any error
+            return {"message": str(e)}, 400
