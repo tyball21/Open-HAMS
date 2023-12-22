@@ -40,6 +40,89 @@ class Animals(MethodView):
             return {"message": str(e)}, 400  # Return an error message and a 400 status code
         return animal
 
+
+    @animals_blueprint.route('/<int:animal_id>/check_in/<int:event_id>', methods=['POST'])
+    def check_in_animal(animal_id, event_id):
+        """
+        Check in an animal to an event.
+        :param animal_id: ID of the animal to check in.
+        :param event_id: ID of the event to check the animal into.
+        :return: Confirmation of check-in.
+        """
+            # Fetch the animal and event from the database
+        animal = Animal.query.get(animal_id)
+        event = Event.query.get(event_id)
+
+        if not animal:
+            return {"message": "Animal not found"}, 404
+
+        if not event:
+            return {"message": "Event not found"}, 404
+
+        # Example: Check if the animal is already checked into an event
+        if AnimalEvent.query.filter_by(animal_id=animal_id, checked_out=None).first():
+            return {"message": "Animal is already checked into another event"}, 400
+
+        # User Authentication (replace None with actual user ID)
+        user_in_id = get_authenticated_user_id()  # Assuming a function to get authenticated user ID
+
+        new_animal_event = AnimalEvent(
+            animal_id=animal_id,
+            event_id=event_id,
+            checked_in=datetime.utcnow(),
+            user_in_id=user_in_id
+        )
+
+        # Audit and Activity Log
+        self.log_activity(animal_id, f"Checked into Event {event_id}")
+        self.log_audit(animal_id, 'check_in', None, event_id, user_in_id)
+
+        db.session.add(new_animal_event)
+        try:
+            db.session.commit()
+            return {"message": f"Animal {animal_id} checked into Event {event_id}"}, 200
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"message": str(e)}, 400
+
+
+
+
+
+    @animals_blueprint.route('/<int:animal_id>/check_out/<int:event_id>', methods=['POST'])
+    def check_out_animal(animal_id, event_id):
+        """
+        Check out an animal from an event.
+        :param animal_id: ID of the animal to check out.
+        :param event_id: ID of the event to check the animal out from.
+        :return: Confirmation of check-out.
+        """
+            # Fetch the AnimalEvent record
+        animal_event = AnimalEvent.query.filter_by(
+            animal_id=animal_id, 
+            event_id=event_id,
+            checked_out=None
+        ).first()
+
+        if not animal_event:
+            return {"message": "Animal not checked into this event"}, 404
+
+            # Upda te the checked_out time
+        animal_event.checked_out = datetime.utcnow()
+            # Add audit and activity log entries
+        self.log_activity(animal_id, f"Checked out from Event {event_id}")
+        self.log_audit(animal_id, 'check_out', event_id, None, None)
+
+        try:
+            db.session.commit()
+            return {"message": f"Animal {animal_id} checked out from Event {event_id}"}, 200
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"message": str(e)}, 400
+
+
+
+
     def update_animal_status(self):
     """
     Updates the checked_in status of all animals based on current time and event schedules.

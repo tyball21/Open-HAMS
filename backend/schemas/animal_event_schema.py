@@ -19,7 +19,7 @@ class AnimalEventSchema(SQLAlchemyAutoSchema):
     zoo_id = auto_field()
 
     # Optional: Nested relationships, uncomment if needed
-    # animal = ma.Nested('AnimalSchema', only=['id', 'name', 'species'])
-    # event = ma.Nested('EventSchema', only=['id', 'name', 'start_at', 'end_at'])
-    # user_in = ma.Nested('UserSchema', only=['id', 'email', 'first_name', 'last_name'])
-    # user_out = ma.Nested('UserSchema', only=['id', 'email', 'first_name', 'last_name'])
+    animal = ma.Nested('AnimalSchema', only=['id', 'name', 'species'])
+    event = ma.Nested('EventSchema', only=['id', 'name', 'start_at', 'end_at'])
+    user_in = ma.Nested('UserSchema', only=['id', 'email', 'first_name', 'last_name'])
+    user_out = ma.Nested('UserSchema', only=['id', 'email', 'first_name', 'last_name'])
