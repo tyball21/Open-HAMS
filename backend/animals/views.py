@@ -14,7 +14,6 @@ from .schemas import AnimalSchema  # Import the AnimalSchema for serialization
 # Import the database instance (db) directly
 from backend.app import db
 
-
 @animals_blueprint.route('/')
 class Animals(MethodView):
     @animals_blueprint.response(200, AnimalSchema(many=True))
@@ -25,7 +24,6 @@ class Animals(MethodView):
         paginated_animals = Animal.query.paginate(page, per_page, error_out=False)
         animals = paginated_animals.items
         return animals
-
 
     @animals_blueprint.arguments(AnimalSchema)
     @animals_blueprint.response(201, AnimalSchema)
@@ -40,7 +38,6 @@ class Animals(MethodView):
             return {"message": str(e)}, 400  # Return an error message and a 400 status code
         return animal
 
-
     @animals_blueprint.route('/<int:animal_id>/check_in/<int:event_id>', methods=['POST'])
     def check_in_animal(animal_id, event_id):
         """
@@ -49,7 +46,7 @@ class Animals(MethodView):
         :param event_id: ID of the event to check the animal into.
         :return: Confirmation of check-in.
         """
-            # Fetch the animal and event from the database
+        # Fetch the animal and event from the database
         animal = Animal.query.get(animal_id)
         event = Event.query.get(event_id)
 
@@ -73,6 +70,9 @@ class Animals(MethodView):
             user_in_id=user_in_id
         )
 
+        # Set last check-in time for the animal
+        animal.last_checkin_time = datetime.utcnow()
+
         # Audit and Activity Log
         self.log_activity(animal_id, f"Checked into Event {event_id}")
         self.log_audit(animal_id, 'check_in', None, event_id, user_in_id)
@@ -85,10 +85,6 @@ class Animals(MethodView):
             db.session.rollback()
             return {"message": str(e)}, 400
 
-
-
-
-
     @animals_blueprint.route('/<int:animal_id>/check_out/<int:event_id>', methods=['POST'])
     def check_out_animal(animal_id, event_id):
         """
@@ -97,7 +93,7 @@ class Animals(MethodView):
         :param event_id: ID of the event to check the animal out from.
         :return: Confirmation of check-out.
         """
-            # Fetch the AnimalEvent record
+        # Fetch the AnimalEvent record
         animal_event = AnimalEvent.query.filter_by(
             animal_id=animal_id, 
             event_id=event_id,
@@ -107,9 +103,26 @@ class Animals(MethodView):
         if not animal_event:
             return {"message": "Animal not checked into this event"}, 404
 
-            # Upda te the checked_out time
+        # Fetch the animal record
+        animal = Animal.query.get(animal_id)
+
+        # Validate against max daily checkouts and max checkout hours
+        if animal.daily_checkout_count >= animal.max_daily_checkouts:
+            return {"message": "Max daily checkouts reached"}, 400
+
+        projected_checkout_duration = animal.daily_checkout_duration + (datetime.utcnow() - animal_event.checked_in)
+        if projected_checkout_duration.total_seconds() / 3600 > animal.max_checkout_hours:
+            return {"message": "Max checkout hours exceeded"}, 400
+
+        # Update the checked_out time and increment daily checkout count
         animal_event.checked_out = datetime.utcnow()
-            # Add audit and activity log entries
+        animal.daily_checkout_count += 1
+        animal.daily_checkout_duration += animal_event.checked_out - animal_event.checked_in
+
+        # Calculate and store the duration
+        animal_event.duration = animal_event.checked_out - animal_event.checked_in
+
+        # Add audit and activity log entries
         self.log_activity(animal_id, f"Checked out from Event {event_id}")
         self.log_audit(animal_id, 'check_out', event_id, None, None)
 
@@ -120,37 +133,37 @@ class Animals(MethodView):
             db.session.rollback()
             return {"message": str(e)}, 400
 
-
-
-
     def update_animal_status(self):
-    """
-    Updates the checked_in status of all animals based on current time and event schedules.
-    """
-    animals = Animal.query.all()
-    current_time = datetime.utcnow()
+        """
+        Updates the checked_in status of all animals based on current time and event schedules.
+        """
+        animals = Animal.query.all()
+        current_time = datetime.utcnow()
 
-    for animal in animals:
-        # Assuming AnimalEvent model links animals to events
-        animal_events = AnimalEvent.query.filter(
-            AnimalEvent.animal_id == animal.id,
-            AnimalEvent.checked_out <= current_time,
-            AnimalEvent.checked_in >= current_time
-        ).all()
+        for animal in animals:
+            # Fetch events linked to the animal
+            animal_events = AnimalEvent.query.filter(
+                AnimalEvent.animal_id == animal.id,
+                AnimalEvent.checked_out <= current_time,
+                AnimalEvent.checked_in >= current_time
+            ).all()
 
-        if animal_events:
-            animal.checked_in = False  # Animal is part of an ongoing event
-        else:
-            animal.checked_in = True  # No ongoing event for this animal
+            old_status = animal.checked_in
+            animal.checked_in = not animal_events  # False if animal is part of ongoing event
 
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        print(f"Error updating animal status: {e}")
+            # Insert logging logic here
+            if old_status != animal.checked_in:
+                activity_details = f"Status changed to {'Checked In' if animal.checked_in else 'Checked Out'} at {datetime.utcnow()}"
+                self.log_activity(animal.id, activity_details)
+                self.log_audit(animal.id, 'checked_in', str(old_status), str(animal.checked_in), 'System')
 
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Error updating animal status: {e}")
 
-        def log_audit(self, animal_id, changed_field, old_value, new_value, changed_by_user_id):
+    def log_audit(self, animal_id, changed_field, old_value, new_value, changed_by_user_id):
         """
         Logs an audit entry for changes to an animal's record.
         :param animal_id: ID of the animal being audited.
@@ -213,7 +226,6 @@ class Animals(MethodView):
                 db.session.rollback()
                 print(f"Error updating animal status: {e}")
 
-
 @animals_blueprint.route('/<int:animal_id>')
 class AnimalById(MethodView):
     @animals_blueprint.response(200, AnimalSchema)
@@ -241,10 +253,9 @@ class AnimalById(MethodView):
 
             db.session.commit()
 
-            # Log changes
-            for key, new_value in update_data.items():
-                if key in old_values and old_values[key] != new_value:
-                    self.log_audit(animal_id, key, old_values[key], new_value, None)  # Assuming None for user ID
+            # Log changes using log_field_changes function
+            new_values = {field: getattr(animal, field) for field in update_data}
+            self.log_field_changes(animal_id, old_values, new_values, user_id=None)  # Assuming None for user ID
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -252,6 +263,22 @@ class AnimalById(MethodView):
 
         return animal
 
+    def log_field_changes(self, animal_id, old_values, new_values, user_id):
+        """
+        Logs field changes for an animal.
+        :param animal_id: ID of the animal.
+        :param old_values: Dictionary of old field values.
+        :param new_values: Dictionary of new field values.
+        :param user_id: ID of the user who made the changes.
+        """
+        for field, old_value in old_values.items():
+            new_value = new_values.get(field)
+            if old_value != new_value:
+                try:
+                    self.log_audit(animal_id, field, old_value, new_value, user_id)
+                except Exception as e:
+                    # Handle logging error (e.g., log to a file or monitoring system)
+                    print(f"Logging Error: {e}")
 
     @animals_blueprint.response(204)
     def delete(self, animal_id):

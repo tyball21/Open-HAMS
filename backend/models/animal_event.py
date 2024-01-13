@@ -11,4 +11,5 @@ class AnimalEvent(db.Model):
     checked_out = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    duration = db.Column(db.Interval, nullable=True)
     zoo_id = db.Column(db.Integer, db.ForeignKey('zoo.id'))

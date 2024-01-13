@@ -12,14 +12,18 @@ class AnimalEventSchema(SQLAlchemyAutoSchema):
     event_id = auto_field()
     user_in_id = auto_field()
     user_out_id = auto_field()
-    checked_out = auto_field()
     checked_in = auto_field()
+    checked_out = auto_field()
     created_at = auto_field()
     updated_at = auto_field()
+    duration = auto_field()
     zoo_id = auto_field()
+    event_type_id = auto_field()
 
     # Optional: Nested relationships, uncomment if needed
     animal = ma.Nested('AnimalSchema', only=['id', 'name', 'species'])
     event = ma.Nested('EventSchema', only=['id', 'name', 'start_at', 'end_at'])
     user_in = ma.Nested('UserSchema', only=['id', 'email', 'first_name', 'last_name'])
     user_out = ma.Nested('UserSchema', only=['id', 'email', 'first_name', 'last_name'])
+    # Adding event_type as a nested relationship
+    event_type = ma.Nested('EventTypeSchema', only=['id', 'name'])
