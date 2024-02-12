@@ -1,6 +1,22 @@
 # backend/animals/views.py
 # Importing the blueprint
-from . import animals_blueprint
+#from flask import request
+#from . import animals_blueprint
+
+# Importing necessary Flask and SQLAlchemy components
+#from flask.views import MethodView
+#from sqlalchemy.exc import SQLAlchemyError
+#from sqlalchemy.inspection import inspect
+
+# Importing your models and schemas
+#from models import Animal  # Import the Animal model
+#from schemas import AnimalSchema  # Import the AnimalSchema for serialization
+
+# Import the database instance (db) directly
+#from backend import db
+
+
+from .. import animals_blueprint
 
 # Importing necessary Flask and SQLAlchemy components
 from flask.views import MethodView
@@ -8,11 +24,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.inspection import inspect
 
 # Importing your models and schemas
-from .models import Animal  # Import the Animal model
-from .schemas import AnimalSchema  # Import the AnimalSchema for serialization
+from ..models import Animal  # Import the Animal model
+from ..schemas import AnimalSchema  # Import the AnimalSchema for serialization
 
 # Import the database instance (db) directly
-from backend.app import db
+from .. import db
 
 @animals_blueprint.route('/')
 class Animals(MethodView):

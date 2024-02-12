@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.zoo_customization import ZooCustomization
+from backend import db
 
 class ZooCustomizationSchema(SQLAlchemyAutoSchema):
     class Meta:

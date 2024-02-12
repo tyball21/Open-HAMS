@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.animal_event import AnimalEvent
+from backend import db
 
 class AnimalEventSchema(SQLAlchemyAutoSchema):
     class Meta:

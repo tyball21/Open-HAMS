@@ -13,3 +13,5 @@ class AnimalEvent(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     duration = db.Column(db.Interval, nullable=True)
     zoo_id = db.Column(db.Integer, db.ForeignKey('zoo.id'))
+    event_type_id = db.Column(db.Integer, db.ForeignKey('event_type.id'))
+    event_type = db.relationship('EventType', backref='animal_events')

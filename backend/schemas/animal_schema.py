@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.animal import Animal
+from backend import db
 
 class AnimalSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -21,12 +22,13 @@ class AnimalSchema(SQLAlchemyAutoSchema):
     created_at = auto_field(dump_only=True)
     updated_at = auto_field(dump_only=True)
     zoo_id = auto_field()
+    daily_checkout_count = auto_field()
+    daily_checkout_duration = auto_field()
+    last_checkin_time = auto_field()
 
     # Optional: Nested relationships, uncomment if needed
-        # regarding animal_events, it may be good to see if an animal event is true and click to view the event  
-    # animal_events = ma.Nested('AnimalEventSchema', many=True, exclude=('animal',))
-        # regarding animal_comments each animal should have it's only profile page and view comments/log there. same goes for the relationships below here 
-    # animal_comments = ma.Nested('AnimalCommentSchema', many=True, exclude=('animal',))
-    # audits = ma.Nested('AnimalAuditSchema', many=True, exclude=('animal',))
-    # health_logs = ma.Nested('AnimalHealthLogSchema', many=True, exclude=('animal',))
-    # activity_logs = ma.Nested('AnimalActivityLogSchema', many=True, exclude=('animal',))
+    animal_events = ma.Nested('AnimalEventSchema', many=True, exclude=('animal',))
+    animal_comments = ma.Nested('AnimalCommentSchema', many=True, exclude=('animal',))
+    audits = ma.Nested('AnimalAuditSchema', many=True, exclude=('animal',))
+    health_logs = ma.Nested('AnimalHealthLogSchema', many=True, exclude=('animal',))
+    activity_logs = ma.Nested('AnimalActivityLogSchema', many=True, exclude=('animal',))

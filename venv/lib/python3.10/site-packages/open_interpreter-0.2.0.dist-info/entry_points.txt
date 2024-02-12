@@ -1,0 +1,4 @@
+[console_scripts]
+i=interpreter:interpreter.start_terminal_interface
+interpreter=interpreter:interpreter.start_terminal_interface
+

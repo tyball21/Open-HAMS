@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.group import Group
+from backend import db
 
 class GroupSchema(SQLAlchemyAutoSchema):
     class Meta:

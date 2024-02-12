@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db
+from .. import db
 
 class UserEvent(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)

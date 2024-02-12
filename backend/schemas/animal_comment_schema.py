@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.animal_comment import AnimalComment
+from backend import db
 
 class AnimalCommentSchema(SQLAlchemyAutoSchema):
     class Meta:

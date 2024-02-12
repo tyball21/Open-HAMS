@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.membership import Membership
+from backend import db
 
 class MembershipSchema(SQLAlchemyAutoSchema):
     class Meta:

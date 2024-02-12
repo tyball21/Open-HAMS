@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.animal_health_log import AnimalHealthLog
+from backend import db
 
 class AnimalHealthLogSchema(SQLAlchemyAutoSchema):
     class Meta:

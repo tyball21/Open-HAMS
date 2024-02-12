@@ -1,5 +1,7 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.role import Role
+from models.permissions import Permission  # Import the Permission model
+from backend import db
 
 class RoleSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -9,4 +11,5 @@ class RoleSchema(SQLAlchemyAutoSchema):
 
     id = auto_field()
     name = auto_field()
-    permissions = auto_field()  # Handles the JSON field
+    # Serialize permissions as nested objects
+    permissions = ma.Nested('PermissionSchema', many=True)

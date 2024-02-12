@@ -1,3 +1,6 @@
+# Purpose: This model appears to track changes to the animal's data itself, such as changes in its status or other attributes.
+
+
 from datetime import datetime
 from . import db
 

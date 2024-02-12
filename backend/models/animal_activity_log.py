@@ -1,3 +1,6 @@
+# Purpose: This model seems to be designed to track specific activities related to an animal, 
+#          like being checked in or out of an event, or any other significant activity.
+
 from datetime import datetime
 from . import db
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db
+from backend import db
 
 class Animal(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,7 +1,6 @@
-
-
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.event import Event
+from backend import db
 
 class EventSchema(SQLAlchemyAutoSchema):
     class Meta:

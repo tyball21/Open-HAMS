@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from models.animal_audit import AnimalAudit
+from backend import db
 
 class AnimalAuditSchema(SQLAlchemyAutoSchema):
     class Meta:
