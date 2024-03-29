@@ -10,6 +10,9 @@ export default {
   ],
   prefix: "",
   theme: {
+    fontFamily: {
+      sans: ["Inter", "sans-serif"],
+    },
     container: {
       center: true,
       padding: "2rem",
@@ -52,6 +55,8 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        blueish: "var(--blueish)",
+        greenish: "var(--greenish)",
       },
       borderRadius: {
         lg: "var(--radius)",
