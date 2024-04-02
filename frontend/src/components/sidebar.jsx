@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Search } from "./ui/input";
 
 export function Sidebar() {
   const location = useLocation();
@@ -37,7 +38,8 @@ export function Sidebar() {
         <img src="/logo.png" alt="logo" className="size-7" />
         <h1 className="text-[20px] font-bold tracking-tight">Open HAMS</h1>
       </div>
-      <nav className="mt-16 space-y-1">
+      <Search placeholder="Search..." className="mt-16" />
+      <nav className="mt-4 space-y-1">
         {routes.map((route) => (
           <SidebarItem key={route.path} {...route} />
         ))}
