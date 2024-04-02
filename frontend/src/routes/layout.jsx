@@ -6,7 +6,7 @@ export function RootLayout() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <body className="bg-body mx-auto flex min-h-screen bg-blueish">
-        <div className="hidden w-56 lg:block">
+        <div className="hidden h-full w-56 lg:block">
           <Sidebar />
         </div>
         <main className="flex flex-1 flex-col overflow-y-auto">
