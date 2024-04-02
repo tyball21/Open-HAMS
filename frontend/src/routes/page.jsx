@@ -27,13 +27,13 @@ export function DashboardPage() {
           Create New Event
         </Button>
       </header>
-      <div className="my-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-24">
+      <div className="my-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4 xl:gap-24">
         <ScrollList title="Live Events" />
         <ScrollList title="Upcoming Events" />
         <ScrollList title="Checked Out" />
         <ScrollList title="Resting" />
       </div>
-      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-24">
+      <div className="mt-10 grid grid-cols-1 gap-8 2xl:grid-cols-2 2xl:gap-24">
         <EventsCalendar />
         <LiveFeed />
       </div>
