@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./index.css";
 import { AnimalsPage } from "./routes/animals/page";
+import { EventsPage } from "./routes/events/page";
 import { RootLayout } from "./routes/layout";
 import { DashboardPage } from "./routes/page";
 
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
       {
         path: "/animals",
         element: <AnimalsPage />,
+      },
+      {
+        path: "/events",
+        element: <EventsPage />,
       },
     ],
   },
