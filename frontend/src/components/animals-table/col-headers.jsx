@@ -1,22 +1,22 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
   CaretSortIcon,
-  EyeNoneIcon
-} from "@radix-ui/react-icons"
+  EyeNoneIcon,
+} from "@radix-ui/react-icons";
 
 export function DataTableColumnHeader({ column, title, className }) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return <div className={cn(className)}>{title}</div>;
   }
 
   return (
@@ -25,8 +25,7 @@ export function DataTableColumnHeader({ column, title, className }) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            size="sm"
-            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            className="-ml-3 h-8 text-black data-[state=open]:bg-accent"
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (
@@ -55,5 +54,5 @@ export function DataTableColumnHeader({ column, title, className }) {
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }
