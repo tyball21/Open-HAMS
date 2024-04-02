@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export function Sidebar() {
   return (
-    <aside className="flex h-full w-full flex-col bg-background p-4">
+    <aside className="flex h-screen w-full flex-col bg-background p-4">
       <div className="flex items-center gap-2">
         <img src="/logo.png" alt="logo" className="size-7" />
         <h1 className="text-[20px] font-bold tracking-tight">Open HAMS</h1>

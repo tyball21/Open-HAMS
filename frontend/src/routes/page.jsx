@@ -6,6 +6,7 @@ import { Menu, Plus } from "lucide-react";
 
 import { EventsCalendar } from "@/components/events-calendar";
 import { Sidebar } from "@/components/sidebar";
+import { LiveFeed } from "@/components/live-feed";
 
 export function DashboardPage() {
   return (
@@ -26,15 +27,17 @@ export function DashboardPage() {
           Create New Event
         </Button>
       </header>
-      <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-24">
+      <div className="my-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-24">
         <ScrollList title="Live Events" />
         <ScrollList title="Upcoming Events" />
         <ScrollList title="Checked Out" />
         <ScrollList title="Resting" />
       </div>
-      <div className="mt-10 grid grid-cols-1 lg:grid-cols-2">
+      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-24">
         <EventsCalendar />
+        <LiveFeed />
       </div>
+      <div className="mt-10 grid grid-cols-1 lg:grid-cols-2"></div>
     </>
   );
 }
