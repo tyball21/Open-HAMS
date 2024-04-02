@@ -15,7 +15,7 @@ export function ScrollList({ title = "Live Events" }) {
         </Button>
       </h2>
       <Separator />
-      <ScrollArea className="h-[121px]">
+      <ScrollArea className="h-[162px]">
         <ul className="h-6">
           {Array.from({ length: 20 }).map((_, i) => (
             <li

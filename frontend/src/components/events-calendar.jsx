@@ -8,14 +8,14 @@ import { Heart, Pencil } from "lucide-react";
 export function EventsCalendar() {
   const [date, setDate] = useState(new Date());
   return (
-    <div className="grid h-[450px] gap-8 rounded-lg bg-white px-8 py-10 shadow-lg md:grid-cols-2">
+    <div className="grid min-h-[450px] gap-8 rounded-lg bg-white px-8 py-10 shadow-sm md:grid-cols-2">
       <Calendar
         mode="single"
         selected={date}
         onSelect={setDate}
         className="mx-auto items-center justify-center"
       />
-      <div className="flex h-full w-full flex-col bg-muted p-4 md:w-[360px]">
+      <div className="flex h-full w-full flex-col bg-muted p-4 md:w-[360px] min-h-[350px]">
         <h2 className="text-lg font-bold text-foreground">Event Name</h2>
         <p className="mb-4 mt-2">Event Description - Yoga in the Park</p>
         <p>{date.toDateString()}</p>
