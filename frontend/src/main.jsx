@@ -3,23 +3,25 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./index.css";
-import { AnimalsPage } from "./routes/animals/page";
-import { EventsPage } from "./routes/events/page";
+import { AnimalsPage } from "./routes/dashboard/animals/page";
+import { EventsPage } from "./routes/dashboard/events/page";
+import { DashboardLayout } from "./routes/dashboard/layout";
+import { DashboardPage } from "./routes/dashboard/page";
 import { RootLayout } from "./routes/layout";
-import { DashboardPage } from "./routes/page";
+import { LoginPage } from "./routes/page";
 
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: "/", element: <DashboardPage /> },
+      { path: "/", element: <LoginPage /> },
       {
-        path: "/animals",
-        element: <AnimalsPage />,
-      },
-      {
-        path: "/events",
-        element: <EventsPage />,
+        element: <DashboardLayout />,
+        children: [
+          { path: "/dashboard", element: <DashboardPage /> },
+          { path: "/animals", element: <AnimalsPage /> },
+          { path: "/events", element: <EventsPage /> },
+        ],
       },
     ],
   },
