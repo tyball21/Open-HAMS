@@ -71,7 +71,7 @@ export function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter your password" />
+                      <Input {...field} placeholder="Enter your password" type="password"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
