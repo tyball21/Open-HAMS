@@ -41,7 +41,7 @@ export function EventsPage() {
           Create New Event
         </Button>
       </header>
-      <div className="mt-10 w-full rounded-lg bg-white p-8 shadow-sm">
+      <div className="mt-10 w-full rounded-lg bg-white p-8 shadow-sm border">
         <h2 className="mb-4 text-2xl font-semibold">All Events</h2>
         <DataTable data={data} columns={columns} />
       </div>

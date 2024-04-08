@@ -19,7 +19,7 @@ function getDummyData() {
   }));
 }
 
-export function AnimalsPage() {
+export function UsersPage() {
   const data = getDummyData();
 
   return (
@@ -40,7 +40,7 @@ export function AnimalsPage() {
           Create New User
         </Button>
       </header>
-      <div className="mt-10 w-full rounded-lg bg-white p-8 shadow-sm">
+      <div className="mt-10 w-full rounded-lg bg-white p-8 border shadow-sm">
         <h2 className="mb-4 text-2xl font-semibold">All Users</h2>
         <DataTable data={data} columns={columns} />
       </div>
