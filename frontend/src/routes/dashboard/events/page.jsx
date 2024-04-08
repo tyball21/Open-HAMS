@@ -7,7 +7,7 @@ import { DataTable } from "@/components/events-table/data-table";
 import { Sidebar } from "@/components/sidebar";
 
 function getDummyData() {
-  return Array.from({ length: 100 }).map(() => ({
+  return Array.from({ length: 5 }).map(() => ({
     image: "https://avartation-api.vercel.app/api",
     name: `Max`,
     description: `This is a description for Event`,

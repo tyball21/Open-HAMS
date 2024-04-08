@@ -1,28 +1,14 @@
+import { ScrollList } from "@/components/scroll-list";
+
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Plus } from "lucide-react";
 
-import { columns } from "@/components/animals-table/cols";
-import { DataTable } from "@/components/animals-table/data-table";
+import { EventsCalendar } from "@/components/events-calendar";
 import { Sidebar } from "@/components/sidebar";
+import { LiveFeed } from "@/components/live-feed";
 
-function getDummyData() {
-  return Array.from({ length: 100 }).map((_, index) => ({
-    image: "https://avartation-api.vercel.app/api",
-    name: `Cat ${index + 1}`,
-    breed: "Domestic Short Hair",
-    age: 4,
-    species: "Cat",
-    status: "Checked In",
-    lastAction: "Checked In",
-    lastCompletedBy: "John Doe",
-    date: "2021-09-01",
-  }));
-}
-
-export function AnimalsPage() {
-  const data = getDummyData();
-
+export function DashboardPage() {
   return (
     <>
       <header className="flex items-center justify-between px-2 lg:px-4">
@@ -38,13 +24,20 @@ export function AnimalsPage() {
         </Sheet>
         <Button className="ml-auto">
           <Plus className="mr-2 size-4" />
-          Add New Animal
+          Create New Event
         </Button>
       </header>
-      <div className="mt-10 w-full rounded-lg bg-white p-8 shadow-sm">
-        <h2 className="mb-4 text-2xl font-semibold">All Animals</h2>
-        <DataTable data={data} columns={columns} />
+      <div className="my-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4 xl:gap-24">
+        <ScrollList title="Live Events" />
+        <ScrollList title="Upcoming Events" />
+        <ScrollList title="Checked Out" />
+        <ScrollList title="Resting" />
       </div>
+      <div className="mt-10 grid grid-cols-1 gap-8 2xl:grid-cols-2 2xl:gap-24">
+        <EventsCalendar />
+        <LiveFeed />
+      </div>
+      <div className="mt-10 grid grid-cols-1 lg:grid-cols-2"></div>
     </>
   );
 }
