@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Activity, Dog, LayoutDashboard } from "lucide-react";
+import { Activity, Dog, LayoutDashboard, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 import { useMemo } from "react";
@@ -14,8 +14,8 @@ export function Sidebar() {
       {
         title: "Dashboard",
         icon: LayoutDashboard,
-        path: "/",
-        active: location.pathname === "/",
+        path: "/dashboard",
+        active: location.pathname === "/dashboard",
       },
       {
         title: "Animals",
@@ -29,15 +29,21 @@ export function Sidebar() {
         path: "/events",
         active: location.pathname === "/events",
       },
+      {
+        title: "Users",
+        icon: User,
+        path: "/users",
+        active: location.pathname === "/users",
+      },
     ];
   }, [location.pathname]);
 
   return (
-    <aside className="flex h-screen w-full flex-col bg-background p-4 ">
-      <div className="flex items-center gap-2">
+    <aside className="flex h-screen w-full flex-col bg-background p-4 border-r">
+      <Link className="flex items-center gap-2" to="/">
         <img src="/logo.png" alt="logo" className="size-7" />
         <h1 className="text-[20px] font-bold tracking-tight">Open HAMS</h1>
-      </div>
+      </Link>
       <Search placeholder="Search..." className="mt-16" />
       <nav className="mt-4 space-y-1">
         {routes.map((route) => (
@@ -46,7 +52,7 @@ export function Sidebar() {
       </nav>
       <div className="mb-2 mt-auto flex gap-2">
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src="https://github.com/ahmedivy.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
