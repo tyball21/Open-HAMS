@@ -31,7 +31,7 @@ export function LiveFeed() {
   liveFeed = [...liveFeed, ...liveFeed, ...liveFeed, ...liveFeed, ...liveFeed];
 
   return (
-    <ScrollArea className="h-[450px] rounded-lg bg-white p-4 shadow-sm lg:p-8">
+    <ScrollArea className="h-[450px] rounded-lg bg-white p-4 shadow-sm border lg:p-8">
       <h2 className="text-lg font-bold text-foreground">Live Feed</h2>
       <div className="mt-4 space-y-4">
         {liveFeed.map((feed, index) => (
