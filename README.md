@@ -1,5 +1,7 @@
 
-![Open-HAMS-icon-small](https://github.com/tyball21/Open-HAMS/assets/3166051/0e9adb7d-469f-41a5-b3b0-1354399796ee)
+![Open-HAMS-icon-small-v7 copy](https://github.com/tyball21/Open-HAMS/assets/3166051/da270242-215d-4298-8091-461177d07ce4)
+
+
 
 # Open HAMS
 
