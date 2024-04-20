@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Plus } from "lucide-react";
 
+import { Sidebar } from "@/components/sidebar";
 import { columns } from "@/components/users-table/cols";
 import { DataTable } from "@/components/users-table/data-table";
-import { Sidebar } from "@/components/sidebar";
 
 function getDummyData() {
   return Array.from({ length: 5 }).map((_, index) => ({
-    image: "https://avartation-api.vercel.app/api",
+    image: "/placeholder-avatar.png",
     name: `User ${index + 1}`,
     email: `user${index + 1}@HAMS.com`,
     role: Math.random() > 0.5 ? "Admin" : "User",
@@ -40,7 +40,7 @@ export function UsersPage() {
           Create New User
         </Button>
       </header>
-      <div className="mt-10 w-full rounded-lg bg-white p-8 border shadow-sm">
+      <div className="mt-10 w-full rounded-lg border bg-white p-8 shadow-sm">
         <h2 className="mb-4 text-2xl font-semibold">All Users</h2>
         <DataTable data={data} columns={columns} />
       </div>

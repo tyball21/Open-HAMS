@@ -82,7 +82,7 @@ export function GeneralSettings() {
         <TabsContent value="userPreferences">
           <div className="mt-10 flex max-w-[500px] flex-col p-6">
             <Avatar className="size-32">
-              <AvatarImage src="https://avartation-api.vercel.app/api?name=John+Doe" />
+              <AvatarImage src="/placeholder-avatar.png?name=John+Doe" />
             </Avatar>
             <h1 className="mt-6 text-xl font-bold">Update Profile</h1>
             <p className="mt-3 text-muted-foreground">Personal Information</p>
@@ -211,17 +211,17 @@ export function GeneralSettings() {
                 </div>
                 <Switch />
               </div>
-              <div className="flex items-center justify-between p-4 border-t-2">
+              <div className="flex items-center justify-between border-t-2 p-4">
                 <div className="flex flex-col justify-between">
                   <h3 className="tex-lg font-semibold">Time Format</h3>
                   <p className="text-muted-foreground">
-                   Set time display preferences
+                    Set time display preferences
                   </p>
                 </div>
                 <Switch />
               </div>
             </div>
-            <div className="flex w-full flex-col rounded-lg border-2 mt-8">
+            <div className="mt-8 flex w-full flex-col rounded-lg border-2">
               <div className="flex items-center justify-between p-4">
                 <div className="flex flex-col justify-between">
                   <h3 className="tex-lg font-semibold">Email Notifications</h3>

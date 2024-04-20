@@ -8,7 +8,7 @@ import { Sidebar } from "@/components/sidebar";
 
 function getDummyData() {
   return Array.from({ length: 5 }).map(() => ({
-    image: "https://avartation-api.vercel.app/api",
+    image: "/placeholder-avatar.png",
     name: `Max`,
     description: `This is a description for Event`,
     eventDate: `2021-09-01`,
@@ -41,7 +41,7 @@ export function EventsPage() {
           Create New Event
         </Button>
       </header>
-      <div className="mt-10 w-full rounded-lg bg-white p-8 shadow-sm border">
+      <div className="mt-10 w-full rounded-lg border bg-white p-8 shadow-sm">
         <h2 className="mb-4 text-2xl font-semibold">All Events</h2>
         <DataTable data={data} columns={columns} />
       </div>

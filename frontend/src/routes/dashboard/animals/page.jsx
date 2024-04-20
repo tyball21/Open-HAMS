@@ -8,7 +8,7 @@ import { Sidebar } from "@/components/sidebar";
 
 function getDummyData() {
   return Array.from({ length: 5 }).map((_, index) => ({
-    image: "https://avartation-api.vercel.app/api",
+    image: "/placeholder-avatar.png",
     name: `Cat ${index + 1}`,
     breed: "Domestic Short Hair",
     age: 4,
@@ -41,7 +41,7 @@ export function AnimalsPage() {
           Add New Animal
         </Button>
       </header>
-      <div className="mt-10 w-full rounded-lg bg-white p-8 shadow-sm border">
+      <div className="mt-10 w-full rounded-lg border bg-white p-8 shadow-sm">
         <h2 className="mb-4 text-2xl font-semibold">All Animals</h2>
         <DataTable data={data} columns={columns} />
       </div>
