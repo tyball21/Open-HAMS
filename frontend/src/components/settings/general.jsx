@@ -62,7 +62,7 @@ export function GeneralSettings() {
   }
 
   return (
-    <section className="mt-8 w-full bg-white p-8">
+    <section className="mt-8 w-full rounded-md bg-white p-8 shadow-sm">
       <Tabs defaultValue="userPreferences" className="mt-6">
         <TabsList className="bg-inherit">
           <TabsTrigger
