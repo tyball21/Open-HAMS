@@ -7,9 +7,10 @@ import { AnimalsPage } from "./routes/dashboard/animals/page";
 import { EventsPage } from "./routes/dashboard/events/page";
 import { DashboardLayout } from "./routes/dashboard/layout";
 import { DashboardPage } from "./routes/dashboard/page";
+import { UsersPage } from "./routes/dashboard/users/page";
 import { RootLayout } from "./routes/layout";
 import { LoginPage } from "./routes/page";
-import { UsersPage } from "./routes/dashboard/users/page";
+import { SettingsPage } from "./routes/dashboard/settings/page";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
           { path: "/animals", element: <AnimalsPage /> },
           { path: "/events", element: <EventsPage /> },
           { path: "/users", element: <UsersPage /> },
+          { path: "/settings", element: <SettingsPage /> },
         ],
       },
     ],
