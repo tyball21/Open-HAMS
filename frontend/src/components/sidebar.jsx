@@ -52,7 +52,7 @@ export function Sidebar() {
       </nav>
       <Link className="mb-2 mt-auto flex gap-2" to="/settings">
         <Avatar>
-          <AvatarImage src="https://github.com/ahmedivy.png" />
+          <AvatarImage src="/placeholder-avatar.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
