@@ -39,7 +39,7 @@ export function Sidebar() {
   }, [location.pathname]);
 
   return (
-    <aside className="flex h-screen w-full flex-col bg-background p-4 border-r">
+    <aside className="flex h-screen w-full flex-col border-r bg-background p-4">
       <Link className="flex items-center gap-2" to="/">
         <img src="/logo.png" alt="logo" className="size-7" />
         <h1 className="text-[20px] font-bold tracking-tight">Open HAMS</h1>
@@ -50,7 +50,7 @@ export function Sidebar() {
           <SidebarItem key={route.path} {...route} />
         ))}
       </nav>
-      <div className="mb-2 mt-auto flex gap-2">
+      <Link className="mb-2 mt-auto flex gap-2" to="/settings">
         <Avatar>
           <AvatarImage src="https://github.com/ahmedivy.png" />
           <AvatarFallback>CN</AvatarFallback>
@@ -61,7 +61,7 @@ export function Sidebar() {
             Account Settings
           </span>
         </div>
-      </div>
+      </Link>
     </aside>
   );
 }
