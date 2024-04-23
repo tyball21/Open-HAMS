@@ -1,57 +1,56 @@
+import { Dog } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 
 export function LiveFeed() {
   var liveFeed = [
     {
       event: "Checked In",
-      description: "Doggo has been checked in",
+      name: "Lilly Lizard",
+      by: "John Doe",
     },
     {
       event: "Checked Out",
-      description: "Doggo has been checked out",
-    },
-    {
-      event: "Checked In",
-      description: "Max Verstappen won the Japanese Grand Prix",
-    },
-    {
-      event: "Checked Out",
-      description: "Doggo has been checked out",
-    },
-    {
-      event: "Checked In",
-      description: "Doggo has been checked in",
-    },
-    {
-      event: "Checked Out",
-      description: "Doggo has been checked out",
+      name: "Lilly Lizard",
+      by: "John Doe",
     },
   ];
 
-  liveFeed = [...liveFeed, ...liveFeed, ...liveFeed, ...liveFeed, ...liveFeed];
-
   return (
-    <ScrollArea className="h-[450px] rounded-lg bg-white p-4 shadow-sm border lg:p-8">
-      <h2 className="text-lg font-bold text-foreground">Live Feed</h2>
-      <div className="mt-4 space-y-4">
+    <ScrollArea className="h-[450px] rounded-lg border bg-white p-4 shadow-sm lg:p-8">
+      <h2 className="text-lg font-bold text-foreground">Activity Feed</h2>
+      <div className="mb-6 mt-4 lg:max-w-[450px] space-y-4">
+        <h2 className="text-lg text-foreground">Today</h2>
         {liveFeed.map((feed, index) => (
-          <Description
-            key={index}
-            title={feed.event}
-            description={feed.description}
-          />
+          <ActivityItem key={index} feed={feed} />
+        ))}
+        <h2 className="text-lg text-foreground">Last Week</h2>
+        {liveFeed.map((feed, index) => (
+          <ActivityItem key={index} feed={feed} />
+        ))}
+        <h2 className="text-lg text-foreground">Last Month</h2>
+        {liveFeed.map((feed, index) => (
+          <ActivityItem key={index} feed={feed} />
         ))}
       </div>
     </ScrollArea>
   );
 }
 
-function Description({ title, description }) {
+function ActivityItem({ feed }) {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center text-[14px]">
-        <h3 className="mr-3 font-bold">{title}:</h3>
-        <p className="">{description}</p>
+    <div className="flex items-center gap-4 rounded-sm border p-2 px-4">
+      <div className="flex items-center justify-center rounded-full bg-[#E6EEF5] p-4">
+        <Dog className="size-8" />
+      </div>
+      <div className="flex w-full flex-col justify-between">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">{feed.event}:</h3>
+          <p className="">Lilly Lizard</p>
+        </div>
+        <div className="flex w-full items-center justify-between gap-2 text-sm">
+          <p>by John Doe</p>
+          <p className="">7:00 PM</p>
+        </div>
       </div>
     </div>
   );
