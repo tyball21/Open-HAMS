@@ -75,7 +75,7 @@ function SidebarItem({ title, icon: Icon, active, path }) {
         active ? "bg-muted" : "hover:bg-muted",
       )}
     >
-      <Icon className="size-4 font-bold text-[#374151] dark:text-white" />
+      <Icon className="size-4 text-[#374151] dark:text-white font-semibold" />
       <span className="text-[14px] text-muted-foreground">{title}</span>
     </Link>
   );
