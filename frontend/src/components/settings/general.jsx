@@ -15,6 +15,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Switch } from "../ui/switch";
 
 export function GeneralSettings() {
@@ -197,6 +204,30 @@ export function GeneralSettings() {
                 </Button>
               </form>
             </Form>
+            <div className="flex w-full flex-col gap-6 mt-20">
+              <Select className="w-full ">
+                <SelectTrigger className="bg-[#F5F5F5] h-12">
+                  <SelectValue placeholder="Account Deletion" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["Account Deletion"].map((group) => (
+                    <SelectItem key={group} value={group}>
+                      {group}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <p className="flex flex-col gap-2">
+                You can deactivate your account, but keep in mind that this
+                action is irreversible.
+              </p>
+
+              <div className="flex w-full items-center gap-2">
+                <Button variant="secondary" className="w-full">Cancel</Button>
+                <Button className="w-full">Deactivate</Button>
+              </div>
+            </div>
           </div>
         </TabsContent>
         <TabsContent value="systemPreferences">

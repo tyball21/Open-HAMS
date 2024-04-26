@@ -15,7 +15,7 @@ export function EventsCalendar() {
         onSelect={setDate}
         className="mx-auto items-center justify-center"
       />
-      <div className="flex h-full min-h-[350px] w-full flex-col bg-muted p-4">
+      <div className="flex h-full min-h-[350px] w-full flex-col bg-[#E6EEF5] p-4">
         <h2 className="text-lg font-bold text-foreground">Event Name</h2>
         <p className="mb-4 mt-2">Event Description - Yoga in the Park</p>
         <p>{date.toDateString()}</p>
