@@ -5,9 +5,9 @@
 
 # Open HAMS
 
-Open Source Habitat Animal Management System - A SaaS dashboard for Zoo's and ambassador programs for animal event management. Designed for any organization to host and run their own animal management dashboard. 
+Open Source Habitat Animal Management System - A SaaS dashboard for Zoo's and ambassador programs for animal and event management. Designed for any organization to host and run their own animal management dashboard. 
 
-V1.0.0-alpha features: Animal check-in and check-out with avaibility and resting periods,  multi-user management, multi-department, data export to .csv, and a live feed.
+V1.0.0-alpha features: Animal check-in and check-out with avaibility and resting periods,  multi-user management, multi-department, data export to .csv, and a live activity feed.
 
 ## Installation
 
