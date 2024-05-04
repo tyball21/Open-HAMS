@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
 from api import users_router
-from core.config import config
+from core.config import settings
 
-app = FastAPI(title=config.app_name, version=config.app_version)
+app = FastAPI(title=settings.app_name, version=settings.app_version)
 
 
 @app.get("/")
