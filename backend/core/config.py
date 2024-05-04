@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 
 load_dotenv()
-print(os.getenv("DB_URI"))
-
 
 class Config(BaseModel):
     app_name: str = "Open HAMS"

@@ -1,1 +1,1 @@
-from .routes.users import router as users_router
+from .routes.users import router as users_router # noqa
