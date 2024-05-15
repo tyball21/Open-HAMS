@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from core.utils import created_at_field, updated_at_field
 from sqlmodel import Field, Relationship, SQLModel
@@ -63,8 +63,12 @@ class User(SQLModel, table=True):
     role_id: int = Field(foreign_key="role.id")
     zoo_id: int | None = Field(foreign_key="zoo.id")
 
-    role: Role = Relationship(back_populates="users", sa_relationship_kwargs={'lazy': 'selectin'})
-    zoo: Zoo = Relationship(back_populates="users")
+    role: Role = Relationship(
+        back_populates="users", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+    zoo: Zoo = Relationship(
+        back_populates="users", sa_relationship_kwargs={"lazy": "selectin"}
+    )
     memberships: list["MemberShip"] = Relationship(back_populates="user")
 
 
@@ -77,6 +81,13 @@ class Animal(SQLModel, table=True):
     max_daily_checkouts: int
     max_daily_checkout_hours: int
     rest_time: float
+    description: str | None = Field(default=None)
+
+    daily_checkout_count: int = Field(default=0)
+    daily_checkout_duration: timedelta = Field(default=timedelta(hours=0))
+    last_checkin_time: datetime | None = Field(default=None)
+    checked_in: bool = Field(default=True)
+    handling_enabled: bool
 
     created_at: datetime = created_at_field()
     updated_at: datetime = updated_at_field()
