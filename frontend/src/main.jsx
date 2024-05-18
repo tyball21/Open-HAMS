@@ -11,12 +11,14 @@ import { UsersPage } from "./routes/dashboard/users/page";
 import { RootLayout } from "./routes/layout";
 import { LoginPage } from "./routes/page";
 import { SettingsPage } from "./routes/dashboard/settings/page";
+import { SignUpPage } from "./routes/signup/page";
 
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
       { path: "/", element: <LoginPage /> },
+      { path: "/signup", element: <SignUpPage /> },
       {
         element: <DashboardLayout />,
         children: [

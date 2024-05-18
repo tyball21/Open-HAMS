@@ -15,9 +15,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-export function LoginPage() {
+export function SignUpPage() {
   const formSchema = z.object({
+    firstname: z.string().min(2).max(50),
+    lastname: z.string().optional(),
     username: z.string().min(2).max(50),
+    email: z.string().email(),
     password: z.string().min(8).max(50),
   });
 
@@ -26,6 +29,9 @@ export function LoginPage() {
     defaultValues: {
       username: "",
       password: "",
+      email: "",
+      firstname: "",
+      lastname: "",
     },
   });
 
@@ -48,17 +54,56 @@ export function LoginPage() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="mt-8 w-full space-y-8 lg:mt-16"
             >
+              <div className="grid w-full gap-3 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="firstname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter your first name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter your last name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter your email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username or Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter your username or email"
-                      />
+                      <Input {...field} placeholder="Enter your username" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -71,25 +116,28 @@ export function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter your password" type="password"/>
+                      <Input
+                        {...field}
+                        placeholder="Enter your password"
+                        type="password"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <Button type="submit" className="w-full">
-                Sign In
+                Sign Up
               </Button>
             </form>
           </Form>
-          <Link className="mt-6 self-start text-sm">Forgot Password?</Link>
           <p className="mt-4">or</p>
           <Button className="mt-4 w-full" variant="secondary">
-            Sign In with Google
+            Sign Up with Google
           </Button>
           <p className="mt-6 self-start text-sm">
-            Didn&apos;t have an account?
-            <Link to="/signup" className="ml-1 hover:underline"> Sign up now</Link>
+            Already a member?
+            <Link to="/" className="underline  ml-1">Log In</Link>
           </p>
         </div>
       </div>
