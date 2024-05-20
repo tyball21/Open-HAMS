@@ -4,11 +4,11 @@ import sqlalchemy as sa
 from sqlmodel import Field
 
 
-def created_at_field() -> Field:
+def created_at_field() -> datetime:
     return Field(default_factory=lambda: datetime.now(UTC))
 
 
-def updated_at_field() -> Field:
+def updated_at_field() -> datetime:
     return Field(
         sa_column=sa.Column(
             sa.DateTime,
