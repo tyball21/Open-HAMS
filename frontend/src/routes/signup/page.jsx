@@ -14,11 +14,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { signup } from "@/lib/auth";
+import { toast } from "sonner";
 
 export function SignUpPage() {
   const formSchema = z.object({
-    firstname: z.string().min(2).max(50),
-    lastname: z.string().optional(),
+    first_name: z.string().min(2).max(50),
+    last_name: z.string().optional(),
     username: z.string().min(2).max(50),
     email: z.string().email(),
     password: z.string().min(8).max(50),
@@ -30,13 +32,32 @@ export function SignUpPage() {
       username: "",
       password: "",
       email: "",
-      firstname: "",
-      lastname: "",
+      first_name: "",
+      last_name: "",
     },
   });
 
   function onSubmit(values) {
     console.log(values);
+
+    toast.promise(
+      async () => {
+        try {
+          var data = await signup(values);
+        } catch (error) {
+          throw new Error(error.message);
+        }
+
+        console.log(data);
+      },
+      {
+        loading: "Signing Up...",
+        success: "Account created successfully",
+        error: (data) => {
+          return data.message || "Something went wrong";
+        },
+      },
+    );
   }
 
   return (
@@ -57,7 +78,7 @@ export function SignUpPage() {
               <div className="grid w-full gap-3 md:grid-cols-2">
                 <FormField
                   control={form.control}
-                  name="firstname"
+                  name="first_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
@@ -70,7 +91,7 @@ export function SignUpPage() {
                 />
                 <FormField
                   control={form.control}
-                  name="lastname"
+                  name="last_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
@@ -132,12 +153,20 @@ export function SignUpPage() {
             </form>
           </Form>
           <p className="mt-4">or</p>
-          <Button className="mt-4 w-full" variant="secondary">
+          <Button
+            className="mt-4 w-full"
+            variant="secondary"
+            onClick={() => {
+              toast.error("Login with Google is not avaiable yet");
+            }}
+          >
             Sign Up with Google
           </Button>
           <p className="mt-6 self-start text-sm">
             Already a member?
-            <Link to="/" className="underline  ml-1">Log In</Link>
+            <Link to="/" className="ml-1  underline">
+              Log In
+            </Link>
           </p>
         </div>
       </div>

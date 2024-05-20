@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Heart } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { login } from "@/lib/auth";
 
 export function LoginPage() {
   const formSchema = z.object({
@@ -31,6 +33,29 @@ export function LoginPage() {
 
   function onSubmit(values) {
     console.log(values);
+
+    toast.promise(
+      async () => {
+        try {
+          var data = await login(values);
+        } catch (error) {
+          throw new Error(error.message);
+        }
+
+        console.log(data);
+
+        const token = data.access_token;
+
+        localStorage.setItem("token", token);
+      },
+      {
+        loading: "Signing in...",
+        success: "Signed in successfully",
+        error: (data) => {
+          return data.message || "Something went wrong";
+        },
+      },
+    );
   }
 
   return (
@@ -71,7 +96,11 @@ export function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter your password" type="password"/>
+                      <Input
+                        {...field}
+                        placeholder="Enter your password"
+                        type="password"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -84,12 +113,21 @@ export function LoginPage() {
           </Form>
           <Link className="mt-6 self-start text-sm">Forgot Password?</Link>
           <p className="mt-4">or</p>
-          <Button className="mt-4 w-full" variant="secondary">
+          <Button
+            className="mt-4 w-full"
+            variant="secondary"
+            onClick={() => {
+              toast.error("Login with Google is not avaiable yet");
+            }}
+          >
             Sign In with Google
           </Button>
           <p className="mt-6 self-start text-sm">
             Didn&apos;t have an account?
-            <Link to="/signup" className="ml-1 hover:underline"> Sign up now</Link>
+            <Link to="/signup" className="ml-1 hover:underline">
+              {" "}
+              Sign up now
+            </Link>
           </p>
         </div>
       </div>
