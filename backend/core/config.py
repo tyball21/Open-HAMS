@@ -18,6 +18,10 @@ class Config(BaseModel):
     ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME")
     ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD")
     ADMIN_EMAIL: str = os.getenv("ADMIN_EMAIL")
-    
+
+    # Main Zoo Info
+    ZOO_NAME: str = "Hogle Zoo"
+    ZOO_LOCATION: str = "Salt Lake City, UT"
+
 
 settings = Config()
