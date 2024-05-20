@@ -1,3 +1,6 @@
+from sqlalchemy.exc import IntegrityError
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from core.config import settings
 from core.db import engine
 from core.security import get_password_hash
@@ -5,8 +8,6 @@ from db.roles import get_role
 from db.users import get_user_by_email
 from db.zoo import get_main_zoo, get_zoo_by_name
 from models import Permission, Role, User, Zoo
-from sqlalchemy.exc import IntegrityError
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 async def seed_roles_and_permissions() -> None:
@@ -86,7 +87,7 @@ async def create_admin() -> None:
             hashed_password=get_password_hash(settings.ADMIN_PASSWORD),
             role=await get_role("admin", session),
             zoo=await get_main_zoo(session),
-        )
+        )  # type: ignore
 
         session.add(user)
         await session.commit()
@@ -102,7 +103,7 @@ async def create_zoo() -> None:
         zoo = Zoo(
             name=settings.ZOO_NAME,
             location=settings.ZOO_LOCATION,
-        )
+        ) # type: ignore
 
         session.add(zoo)
         await session.commit()

@@ -1,7 +1,8 @@
+from sqlmodel import select
+
 from models import Role
-from sqlmodel import Session, select
 
 
-async def get_role(name: str, session: Session) -> Role | None:
+async def get_role(name: str, session) -> Role | None:
     role = (await session.exec(select(Role).where(Role.name == name))).first()
     return role

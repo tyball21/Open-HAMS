@@ -1,9 +1,8 @@
-from fastapi import APIRouter, HTTPException
-
 from api.deps import CurrentUser, SessionDep
 from db.animals import get_all_animals, get_animal_by_id
 from db.utils import has_permission
-from models import Animal, AnimalIn
+from fastapi import APIRouter, HTTPException
+from models import Animal, AnimalIn, Event
 
 router = APIRouter(prefix="/animals", tags=["Animals"])
 
