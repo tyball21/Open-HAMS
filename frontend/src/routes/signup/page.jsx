@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Heart } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -15,11 +14,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { login } from "@/lib/auth";
+import { signup } from "@/lib/auth";
+import { toast } from "sonner";
 
-export function LoginPage() {
+export function SignUpPage() {
   const formSchema = z.object({
+    first_name: z.string().min(2).max(50),
+    last_name: z.string().optional(),
     username: z.string().min(2).max(50),
+    email: z.string().email(),
     password: z.string().min(8).max(50),
   });
 
@@ -28,6 +31,9 @@ export function LoginPage() {
     defaultValues: {
       username: "",
       password: "",
+      email: "",
+      first_name: "",
+      last_name: "",
     },
   });
 
@@ -37,20 +43,16 @@ export function LoginPage() {
     toast.promise(
       async () => {
         try {
-          var data = await login(values);
+          var data = await signup(values);
         } catch (error) {
           throw new Error(error.message);
         }
 
         console.log(data);
-
-        const token = data.access_token;
-
-        localStorage.setItem("token", token);
       },
       {
-        loading: "Signing in...",
-        success: "Signed in successfully",
+        loading: "Signing Up...",
+        success: "Account created successfully",
         error: (data) => {
           return data.message || "Something went wrong";
         },
@@ -73,17 +75,56 @@ export function LoginPage() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="mt-8 w-full space-y-8 lg:mt-16"
             >
+              <div className="grid w-full gap-3 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="first_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter your first name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="last_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter your last name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter your email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username or Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter your username or email"
-                      />
+                      <Input {...field} placeholder="Enter your username" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -107,11 +148,10 @@ export function LoginPage() {
                 )}
               />
               <Button type="submit" className="w-full">
-                Sign In
+                Sign Up
               </Button>
             </form>
           </Form>
-          <Link className="mt-6 self-start text-sm">Forgot Password?</Link>
           <p className="mt-4">or</p>
           <Button
             className="mt-4 w-full"
@@ -120,13 +160,12 @@ export function LoginPage() {
               toast.error("Login with Google is not avaiable yet");
             }}
           >
-            Sign In with Google
+            Sign Up with Google
           </Button>
           <p className="mt-6 self-start text-sm">
-            Didn&apos;t have an account?
-            <Link to="/signup" className="ml-1 hover:underline">
-              {" "}
-              Sign up now
+            Already a member?
+            <Link to="/" className="ml-1  underline">
+              Log In
             </Link>
           </p>
         </div>
