@@ -124,7 +124,7 @@ async def remove_member_from_group(
             status_code=400, detail="User is not a member of this group"
         )
 
-    session.delete(membership)
+    await session.delete(membership)
     await session.commit()
 
     return {"message": "User removed from group successfully"}
