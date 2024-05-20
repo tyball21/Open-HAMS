@@ -10,8 +10,6 @@ from models import (
     GroupWithZoo,
     MemberShip,
     User,
-    UserPublic,
-    UserWithRole,
 )
 from sqlmodel import select
 
