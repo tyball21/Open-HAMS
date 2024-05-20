@@ -35,3 +35,12 @@
 ```shell
     fastapi dev app.py
 ```
+
+> Make sure to add a .env file with same as configuration as in .env.example
+
+For the first time, make sure to apply database migrations:
+
+```shell
+    alembic revision --autogenerate -m "create database tables"
+    alembic upgrade head 
+```
