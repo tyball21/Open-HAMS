@@ -23,3 +23,9 @@ class UserCreate(UserUpdate):
 
 class RoleIn(BaseModel):
     name: str
+
+
+class ZooIn(BaseModel):
+    name: str
+    location: str
+    information: str | None
