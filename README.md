@@ -43,7 +43,7 @@ We welcome contributions to both the frontend and backend of Open HAMS. Please r
 
 MIT License
 
-Copyright (c) [year] Open HAMS and The Hogel Zoo
+Copyright (c) [2024] Open HAMS and The Hogel Zoo
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
