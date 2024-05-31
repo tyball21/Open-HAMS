@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 
+import { signup } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signup } from "@/lib/auth";
 import { toast } from "sonner";
 
 export function SignUpPage() {
