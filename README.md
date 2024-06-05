@@ -2,6 +2,8 @@
 
 ![Open-HAMS-icon-small-v7 copy](https://github.com/tyball21/Open-HAMS/assets/3166051/da270242-215d-4298-8091-461177d07ce4)
 
+
+
 Open Source Habitat Animal Management System - A SaaS dashboard for Zoo's and ambassador programs for animal and event management. Designed for any organization to host and run their own animal management dashboard. 
 
 V1.0.0-alpha features: Animal check-in and check-out with availability and resting periods, multi-user management, multi-department, data export to .csv, and a live activity feed.
@@ -34,9 +36,18 @@ For detailed installation and usage instructions, please refer to the README fil
 ## Join the Discord Community
 Open HAMS Discord Server: https://discord.gg/CVxRvMzqWQ 
 
+
 ## Contributing
 
 We welcome contributions to both the frontend and backend of Open HAMS. Please refer to the respective README.md files for more details on how to contribute.
+
+
+
+## Acknowledgments
+
+![TeKmy2fy_400x400 1](https://github.com/tyball21/Open-HAMS/assets/3166051/0e2a4e7e-1294-4ed6-96ad-e42912ad9685)
+
+A special thank you to the Utah Hogel Zoo and their amazing team: Bob Cisneros, Autumn Henry, and Waqas Javed. Your support and collaboration have been invaluable to this open source project.
 
 
 ## License
