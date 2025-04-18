@@ -28,10 +28,14 @@ export function AuthLayout() {
             home
           </Link>
         </div>
-        <div className="flex items-center gap-2 border-t pt-2">
-          {/* Remove this line below */}
-          <Link to="/terms" className="ml-auto text-[#064E3B]">
-            Terms
+        <div className="flex items-center gap-4 border-t pt-2">
+          <Link 
+            to="https://github.com/tyball21/Open-HAMS" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#064E3B] hover:underline"
+          >
+            GitHub
           </Link>
         </div>
       </footer>
