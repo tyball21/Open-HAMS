@@ -90,8 +90,9 @@ async def get_animals_status(
                 status = "unavailable"
                 status_description = "Daily Check-out limit reached"
 
+            # Restore block with None check
             # if max daily checkout duration reached
-            elif daily_event_duration and daily_event_duration >= timedelta(
+            elif animal.max_daily_checkout_hours is not None and daily_event_duration and daily_event_duration >= timedelta(
                 hours=animal.max_daily_checkout_hours
             ):
                 status = "unavailable"
@@ -245,7 +246,7 @@ def get_action(field: str) -> AuditActions:
             return "max_checkout_hours_changed"
         case "rest_time":
             return "rest_time_changed"
-        case "image":
+        case "image_filename":
             return "image_updated"
         case "tier":
             return "tier_changed"

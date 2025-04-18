@@ -182,7 +182,7 @@ class AnimalIn(SQLModel):
     species: str
     image_filename: str | None = Field(default=None)
     max_daily_checkouts: int
-    max_daily_checkout_hours: int
+    max_daily_checkout_hours: int | None = Field(default=None)
     rest_time: float
     description: str | None = Field(default=None)
     tier: int = Field(default=1)
@@ -223,6 +223,7 @@ class AnimalIn(SQLModel):
 
 class Animal(AnimalIn, table=True):
     id: int = Field(primary_key=True)
+    max_daily_checkout_hours: int | None = Field(default=None, nullable=True)
 
     created_at: datetime = created_at_field()
     updated_at: datetime = updated_at_field()

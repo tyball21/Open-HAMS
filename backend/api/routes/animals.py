@@ -45,6 +45,8 @@ from models import (
     Zoo,
 )
 
+IMAGE_DIR = Path("backend/static/animal_images") # Define the directory for animal images
+
 router = APIRouter(prefix="/animals", tags=["Animals"])
 
 
@@ -308,7 +310,7 @@ async def create_animal(
     name: str = Form(...),
     species: str = Form(...),
     max_daily_checkouts: int = Form(...),
-    max_daily_checkout_hours: int = Form(...),
+    max_daily_checkout_hours: int | None = Form(None),
     rest_time: float = Form(...),
     handling_enabled: bool = Form(...),
     zoo_id: int = Form(...),
@@ -433,7 +435,7 @@ async def update_animal(
     name: str = Form(...),
     species: str = Form(...),
     max_daily_checkouts: int = Form(...),
-    max_daily_checkout_hours: int = Form(...),
+    max_daily_checkout_hours: int | None = Form(None),
     rest_time: float = Form(...),
     handling_enabled: bool = Form(...),
     zoo_id: int = Form(...),
