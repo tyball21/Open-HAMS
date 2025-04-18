@@ -7,7 +7,9 @@ export const eventSchema = z.object({
     .min(3, "Name is too short"),
   description: z
     .string({ message: "Please enter a description" })
-    .min(10, "Description must be at least 10 characters"),
+    .min(10, "Description must be at least 10 characters")
+    .optional()
+    .or(z.literal('')),
   date: z
     .object(
       {

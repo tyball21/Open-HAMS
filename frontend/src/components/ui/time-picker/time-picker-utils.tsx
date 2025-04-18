@@ -178,7 +178,7 @@ export function getArrowByType(
  */
 export function convert12HourTo24Hour(hour: number, period: Period) {
   if (period === "PM") {
-    if (hour <= 11) {
+    if (hour < 12) {
       return hour + 12;
     } else {
       return hour;

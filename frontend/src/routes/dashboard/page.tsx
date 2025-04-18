@@ -21,6 +21,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { hasPermission, timeTill } from "@/utils";
 import { EventsCalendar } from "@/components/dashboard/events-calendar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function DashboardPage() {
   return (
@@ -77,7 +83,21 @@ function UpcomingLiveEvents() {
 
   return (
     <>
-      <ScrollList title="Live Events" isLoading={isLoading}>
+      <ScrollList
+        title={
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="cursor-default">
+                Live Events
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Events currently in progress</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        }
+        isLoading={isLoading}
+      >
         {upcomingLiveEvents?.live.map((event_details) => (
           <ListItem
             key={event_details.event.id}

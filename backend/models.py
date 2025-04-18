@@ -262,7 +262,7 @@ class EventType(EventTypeIn, table=True):
 
 class EventIn(SQLModel):
     name: str
-    description: str
+    description: str | None = None
     start_at: datetime = Field(
         sa_column=sa.Column(
             type_=TIMESTAMP(timezone=True),

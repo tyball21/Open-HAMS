@@ -55,20 +55,25 @@ Break the product into logical chunks. Nest features → tasks.
     - *Issue:* Potential user confusion with zoo's specific IDs.
     - *Note:* Renamed column header in animals table to "System ID" for clarity.
 
-### Event Management 🆕 P1
-- **Event Creation Adjustments:** 🆕 P1
-  - Make event description optional. 🆕 P1
+### Event Management ✅ P1
+- **Event Creation Adjustments:** ✅ P1
+  - Make event description optional. ✅ P1
     - *Issue:* Description currently mandatory.
+    - *Note:* Made description field optional in `EventIn` model, created database migration (`702fbe8a9c35`), and updated frontend Zod schema.
   - Allow future reservations for currently checked-out animals. 🆕 P1
     - *Issue:* Cannot reserve if animal is currently checked out.
-- **Dashboard and Event Functionality:** 🆕 P1
-  - Clarify "live events" definition on dashboard. 🆕 P1
+- **Dashboard and Event Functionality:** ✅ P1
+  - Clarify "live events" definition on dashboard. ✅ P1
     - *Issue:* Unclear definition.
-  - Redirect to dashboard after event deletion. 🆕 P1
+    - *Note:* Added tooltip to "Live Events" heading explaining these are "Events currently in progress".
+  - Redirect to dashboard after event deletion. ✅ P1
     - *Issue:* No redirection currently.
+    - *Note:* Added navigation to dashboard (`navigate("/dashboard")`) after successful event deletion.
   - Enable editing of event start times post-creation. 🆕 P1
     - *Issue:* Cannot change start time after creation.
-  - Fix 12PM reverting to 12AM time entry issue. 🆕 P1
+  - Fix 12PM reverting to 12AM time entry issue. ✅ P1
     - *Issue:* Incorrect time handling.
-  - Auto-check-in animals when their event is deleted. 🆕 P1
+    - *Note:* Fixed the `convert12HourTo24Hour` function logic and updated period handling in the `TimePeriodSelect` component.
+  - Auto-check-in animals when their event is deleted. ✅ P1
     - *Issue:* Animals remain checked out if event is deleted.
+    - *Note:* Modified the `delete_event` endpoint to automatically check in any animals that are currently checked out before deleting the event.
