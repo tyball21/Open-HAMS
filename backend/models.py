@@ -180,7 +180,7 @@ class AnimalEvent(SQLModel, table=True):
 class AnimalIn(SQLModel):
     name: str
     species: str
-    image: str | None = Field(default=None)
+    image_filename: str | None = Field(default=None)
     max_daily_checkouts: int
     max_daily_checkout_hours: int
     rest_time: float
@@ -207,7 +207,7 @@ class AnimalIn(SQLModel):
                 {
                     "name": "Lion",
                     "species": "Panthera leo",
-                    "image": "https://example.com/lion.jpg",
+                    "image_filename": "https://example.com/lion.jpg",
                     "max_daily_checkouts": 10,
                     "max_daily_checkout_hours": 2,
                     "rest_time": 1.5,

@@ -1,4 +1,5 @@
 import { useAnimalStatus } from "@/api/queries";
+import { AnimalStatus } from "@/api/animals";
 import { formatDate, formatTime } from "@/utils";
 import { AnimalEventWithDetails } from "@/utils/types";
 import { CheckCircle, XCircle } from "lucide-react";
@@ -22,13 +23,13 @@ export function AnimalsSelect(props: {
     <CustomSelect
       label={props.title || "Animals"}
       placeholder="Search animals"
-      options={animals.data!.map((animal_info) => ({
+      options={animals.data!.map((animal_info: AnimalStatus) => ({
         value: animal_info.animal.id.toString(),
         label: animal_info.animal.name,
         toRender: (
           <>
             <Avatar className="size-5">
-              <AvatarImage src={animal_info.animal.image!} />
+              <AvatarImage src={animal_info.animal.image_filename ? `/static/animal_images/${animal_info.animal.image_filename}` : undefined} />
             </Avatar>
             <span className="font-extralightlight text-xs text-foreground">
               {animal_info.animal.name}
@@ -56,17 +57,17 @@ export function AnimalsSelect(props: {
       setSelected={props.setSelectedAnimals}
       listElement={({ value }: { value: string }) => {
         const animal = animals.data!.find(
-          (animal_info) => animal_info.animal.id.toString() === value,
+          (animal_info: AnimalStatus) => animal_info.animal.id.toString() === value,
         );
 
         const animalDetails = props.animalsDetails?.find(
           (animalDetails) => animalDetails.animal.id.toString() === value,
         );
         return (
-          <AvatarWithTooltip src={animal?.animal.image!}>
+          <AvatarWithTooltip src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : ""}>
             <div className="flex items-center gap-2">
               <Avatar className="size-8">
-                <AvatarImage src={animal?.animal.image!} />
+                <AvatarImage src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : undefined} />
               </Avatar>
               <span className="text-md font-semibold">
                 {animal?.animal.name}

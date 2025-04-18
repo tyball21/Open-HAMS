@@ -1,6 +1,9 @@
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
+import shutil
+import uuid
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Form, UploadFile, File
 from fastapi.responses import JSONResponse
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -299,28 +302,79 @@ async def get_checked_out_animals(session: SessionDep) -> list[AnimalWithCurrent
 
 
 @router.post("/")
-async def create_animal(body: AnimalIn, session: SessionDep, current_user: CurrentUser):
-    if not has_permission(current_user.role.permissions, "add_animal"):
-        raise HTTPException(
-            status_code=401, detail="You are not authorized to perform this action"
-        )
+async def create_animal(
+    session: SessionDep,
+    current_user: CurrentUser,
+    name: str = Form(...),
+    species: str = Form(...),
+    max_daily_checkouts: int = Form(...),
+    max_daily_checkout_hours: int = Form(...),
+    rest_time: float = Form(...),
+    handling_enabled: bool = Form(...),
+    zoo_id: int = Form(...),
+    description: str | None = Form(None),
+    tier: int = Form(1),
+    image: UploadFile | None = File(None),
+):
+    if not await has_permission(current_user, "create_animal", session):
+        raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    animal = Animal(**body.model_dump())
-    session.add(animal)
-    await session.commit()
-    await session.refresh(animal)
-    await session.refresh(current_user)
+    # Ensure image directory exists
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-    # log audit
-    await log_audit(
-        session,
-        animal_id=animal.id,
-        changed_by=current_user.id,
-        action="animal_created",
-        description=f"{current_user.first_name} {current_user.last_name} ({current_user.role.name}) created an animal with name {animal.name}",
+    image_filename_to_save = None
+    if image:
+        if not image.content_type or not image.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=400, detail="Invalid file type. Only images are allowed."
+            )
+        # Generate unique filename
+        extension = Path(image.filename).suffix if image.filename else ".jpg" # Default extension
+        unique_filename = f"{uuid.uuid4()}{extension}"
+        file_location = IMAGE_DIR / unique_filename
+
+        # Save the file
+        try:
+            with file_location.open("wb") as buffer:
+                shutil.copyfileobj(image.file, buffer)
+            image_filename_to_save = unique_filename
+        except Exception as e:
+            # Log error appropriately
+            print(f"Error saving file: {e}") 
+            raise HTTPException(status_code=500, detail="Error saving image file.")
+        finally:
+            image.file.close()
+
+    # Create AnimalIn data (or directly Animal instance)
+    animal_data = AnimalIn(
+        name=name,
+        species=species,
+        max_daily_checkouts=max_daily_checkouts,
+        max_daily_checkout_hours=max_daily_checkout_hours,
+        rest_time=rest_time,
+        handling_enabled=handling_enabled,
+        zoo_id=zoo_id,
+        description=description,
+        tier=tier,
+        image_filename=image_filename_to_save, # Use the saved filename
+        checked_in=True, # Default value when creating
+        status="checked_in" # Default value when creating
     )
 
-    return JSONResponse({"message": "Animal created"}, status_code=200)
+    db_animal = Animal.model_validate(animal_data)
+
+    session.add(db_animal)
+    await session.commit()
+    await session.refresh(db_animal)
+
+    await log_audit(
+        session=session,
+        user_id=current_user.id,
+        animal_id=db_animal.id,
+        action="created",
+    )
+
+    return db_animal
 
 
 @router.delete("/{animal_id}")
@@ -374,28 +428,102 @@ async def delete_animal(animal_id: int, session: SessionDep, current_user: Curre
 @router.put("/{animal_id}")
 async def update_animal(
     animal_id: int,
-    animal_update: AnimalIn,
     session: SessionDep,
     current_user: CurrentUser,
+    name: str = Form(...),
+    species: str = Form(...),
+    max_daily_checkouts: int = Form(...),
+    max_daily_checkout_hours: int = Form(...),
+    rest_time: float = Form(...),
+    handling_enabled: bool = Form(...),
+    zoo_id: int = Form(...),
+    description: str | None = Form(None),
+    tier: int = Form(1),
+    checked_in: bool = Form(...), # Keep checked_in status if provided
+    status: str | None = Form(None), # Keep status if provided
+    image: UploadFile | None = File(None), # Changed from animal_update: AnimalIn
 ):
-    if not has_permission(current_user.role.permissions, "update_animals"):
-        raise HTTPException(
-            status_code=401, detail="You are not authorized to perform this action"
-        )
+    if not await has_permission(current_user, "update_animal", session):
+        raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    animal = await get_animal_by_id(animal_id, session)
-    if not animal:
+    db_animal = await get_animal_by_id(animal_id, session)
+    if not db_animal:
         raise HTTPException(status_code=404, detail="Animal not found")
 
-    # log audits for each field thats updated
-    await log_fields_update(session, animal, animal_update, current_user)
+    # Ensure image directory exists
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-    for field, value in animal_update.model_dump().items():
-        setattr(animal, field, value)
+    update_data = {
+        "name": name,
+        "species": species,
+        "max_daily_checkouts": max_daily_checkouts,
+        "max_daily_checkout_hours": max_daily_checkout_hours,
+        "rest_time": rest_time,
+        "handling_enabled": handling_enabled,
+        "zoo_id": zoo_id,
+        "description": description,
+        "tier": tier,
+        "checked_in": checked_in,
+        "status": status if status is not None else db_animal.status # Keep old status if not provided
+    }
+    image_filename_to_save = db_animal.image_filename # Keep old image by default
 
+    if image:
+        if not image.content_type or not image.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=400, detail="Invalid file type. Only images are allowed."
+            )
+        # Generate unique filename
+        extension = Path(image.filename).suffix if image.filename else ".jpg"
+        unique_filename = f"{uuid.uuid4()}{extension}"
+        file_location = IMAGE_DIR / unique_filename
+
+        # Delete old image file if it exists
+        if db_animal.image_filename:
+            old_file_path = IMAGE_DIR / db_animal.image_filename
+            if old_file_path.is_file():
+                old_file_path.unlink()
+
+        # Save the new file
+        try:
+            with file_location.open("wb") as buffer:
+                shutil.copyfileobj(image.file, buffer)
+            image_filename_to_save = unique_filename
+        except Exception as e:
+            print(f"Error saving file: {e}")
+            raise HTTPException(status_code=500, detail="Error saving image file.")
+        finally:
+            image.file.close()
+
+    update_data["image_filename"] = image_filename_to_save
+
+    # Log changes before updating
+    changed_fields = await log_fields_update(
+        session=session,
+        user_id=current_user.id,
+        animal_id=db_animal.id,
+        old_data=db_animal,
+        new_data=update_data,
+    )
+
+    # Update the animal object
+    for key, value in update_data.items():
+        setattr(db_animal, key, value)
+
+    session.add(db_animal)
     await session.commit()
-    await session.refresh(animal)
-    return JSONResponse(content={"message": "Animal updated"}, status_code=200)
+    await session.refresh(db_animal)
+
+    if changed_fields:
+      await log_audit(
+          session=session,
+          user_id=current_user.id,
+          animal_id=db_animal.id,
+          action="updated",
+          description=f"Fields updated: {', '.join(changed_fields)}"
+      )
+
+    return db_animal
 
 
 @router.put("/{animal_id}/unavailable")

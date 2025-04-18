@@ -35,13 +35,14 @@ Brief one‑liner on purpose, vision, and success criteria.
 Break the product into logical chunks. Nest features → tasks.
 
 ### Animal Management 🆕 P1
-- **Photo Upload:** Allow direct upload from computer. 🆕 P1
+- **Photo Upload:** Allow direct upload from computer. ✅ P1
   - *Issue:* Currently only online photos can be uploaded.
+  - *Note:* Implemented workaround using `(object as any)["image_filename"] || (object as any)["image"]` to handle type mismatch between backend model changes and frontend type definitions. ⚠️ Tech debt: Update OpenAPI types when schema stabilizes.
 - **Max Checkout Hours:** Remove field unless needed for defined auto-check-in. 🆕 P1
   - *Issue:* Not needed for multi-day checkouts.
 - **Rest Time Requirement:** Remove mandatory field from animal creation. 🆕 P1
   - *Issue:* Determined by offsite status and handling frequency.
-- **Zoo Naming Consistency:** Update all "Hogle Zoo" instances to "Utah's Hogle Zoo." 🆕 P1
+- **Zoo Naming Consistency:** Update all "Hogle Zoo" instances to "Utah's Hogle Zoo." 💤 PENDING P1
   - *Issue:* Inconsistent naming.
 - **Animal Creation Form Improvements:** 🆕 P1
   - Make non-critical fields optional. 🆕 P1

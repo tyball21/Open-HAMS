@@ -301,9 +301,13 @@ async def validate_event_clashes(
     )
     clashing_animals = list(clashing_animals.all())
     if clashing_animals:
+        # Pre-calculate parts for clarity
+        animal_names = ", ".join(clashing_animals)
+        plural_s = "s" if len(clashing_animals) > 1 else ""
         raise HTTPException(
             status_code=400,
-            detail=f"Animal{"" if len(clashing_animals) == 1 else "s"} {', '.join([animal for animal in clashing_animals])} is already assigned to an event during this time",
+            # Use pre-calculated parts in the f-string
+            detail=f"Animal{plural_s} {animal_names} is already assigned to an event during this time",
         )
 
     return None

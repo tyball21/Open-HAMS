@@ -47,6 +47,8 @@ import {
 } from "../ui/select";
 import { AvatarWithTooltip } from "./avatar-with-tooltip";
 import { CustomSelect } from "./custom-select";
+import { AnimalStatus } from "@/api/animals";
+import { User, EventType, Zoo } from "@/utils/types";
 
 export function NewEventModel() {
   const [open, setOpen] = useState(false);
@@ -205,7 +207,7 @@ export function NewEventCard({
                 <CustomSelect
                   label="Handlers"
                   placeholder="Search handlers"
-                  options={handlers!.map((handler) => ({
+                  options={handlers!.map((handler: User) => ({
                     value: handler.id.toString(),
                     label: `${handler.first_name} ${handler.last_name}`,
                     toRender: (
@@ -216,8 +218,11 @@ export function NewEventCard({
                             {getInitials(handler.first_name, handler.last_name)}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-xs font-light text-foreground">
-                          {handler.first_name} {handler.last_name}
+                        <span className="font-extralightlight text-xs text-foreground">
+                          {`${handler.first_name} ${handler.last_name}`}
+                        </span>
+                        <span className="ml-auto text-xs text-foreground">
+                          {handler?.role?.name}
                         </span>
                       </>
                     ),
@@ -225,9 +230,7 @@ export function NewEventCard({
                   selected={selectedHandlers}
                   setSelected={setSelectedHandlers}
                   listElement={({ value }: { value: string }) => {
-                    const handler = handlers!.find(
-                      (handler) => handler.id.toString() === value,
-                    );
+                    const handler = handlers!.find((h: User) => h.id.toString() === value);
                     return (
                       <AvatarWithTooltip
                         src={handler?.image!}
@@ -277,13 +280,13 @@ export function NewEventCard({
                 <CustomSelect
                   label="Animals"
                   placeholder="Search animals"
-                  options={animals!.map((animal_info) => ({
+                  options={animals!.map((animal_info: AnimalStatus) => ({
                     value: animal_info.animal.id.toString(),
                     label: animal_info.animal.name,
                     toRender: (
                       <>
                         <Avatar className="size-5">
-                          <AvatarImage src={animal_info.animal.image!} />
+                          <AvatarImage src={animal_info.animal.image_filename ? `/static/animal_images/${animal_info.animal.image_filename}` : undefined} />
                           <AvatarFallback>
                             {getInitials(animal_info.animal.name)}
                           </AvatarFallback>
@@ -314,17 +317,16 @@ export function NewEventCard({
                   setSelected={setSelectedAnimals}
                   listElement={({ value }: { value: string }) => {
                     const animal = animals!.find(
-                      (animal_info) =>
-                        animal_info.animal.id.toString() === value,
+                      (h: AnimalStatus) => h.animal.id.toString() === value,
                     );
                     return (
                       <AvatarWithTooltip
-                        src={animal?.animal.image!}
+                        src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : ""}
                         name={animal?.animal.name}
                       >
                         <div className="flex items-center gap-2">
                           <Avatar className="size-8">
-                            <AvatarImage src={animal?.animal.image!} />
+                            <AvatarImage src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : undefined} />
                             <AvatarFallback>
                               {getInitials(animal?.animal.name!)}
                             </AvatarFallback>
@@ -384,7 +386,7 @@ export function NewEventCard({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {eventTypes?.map((eventType) => (
+                      {eventTypes?.map((eventType: EventType) => (
                         <SelectItem
                           key={eventType.id}
                           value={eventType.id.toString()}
@@ -414,7 +416,7 @@ export function NewEventCard({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {zoos?.map((zoo) => (
+                      {zoos?.map((zoo: Zoo) => (
                         <SelectItem key={zoo.id} value={zoo.id.toString()}>
                           {zoo.name}
                         </SelectItem>

@@ -11,12 +11,16 @@ export const animalTableColumns: ColumnDef<Animal>[] = [
   {
     accessorKey: "image",
     header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
-    cell: ({ row }) => (
-      <Avatar className="m-2">
-        <AvatarImage src={row.getValue("image")} alt={row.getValue("name")} />
-        <AvatarFallback>{row.original.name[0]}</AvatarFallback>
-      </Avatar>
-    ),
+    cell: ({ row }) => {
+      const imageField = (row.original as any)["image_filename"] || (row.original as any)["image"];
+      const imageUrl = imageField ? `/static/animal_images/${imageField}` : undefined;
+      return (
+        <Avatar className="m-2">
+          <AvatarImage src={imageUrl} alt={row.original.name} />
+          <AvatarFallback>{row.original.name[0]}</AvatarFallback>
+        </Avatar>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
