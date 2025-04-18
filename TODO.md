@@ -77,3 +77,19 @@ Break the product into logical chunks. Nest features → tasks.
   - Auto-check-in animals when their event is deleted. ✅ P1
     - *Issue:* Animals remain checked out if event is deleted.
     - *Note:* Modified the `delete_event` endpoint to automatically check in any animals that are currently checked out before deleting the event.
+
+### Event Date Handling Improvements 🆕 P0
+- **Allow Same-Day Event Creation:** 🆕 P0
+  - *Issue:* System rejects events with start times that appear to have already passed, preventing same-day event creation.
+  - *Implementation Plan:*
+    - Modify date validation in `eventSchema` (frontend/src/api/schemas/event.ts) to allow same-day events
+    - Replace the current validation that requires start date > yesterday with a check that ensures start time > current time for same-day events only
+    - Update any backend validations that might reject same-day events
+  
+- **Simplify One-Day Events:** 🆕 P0
+  - *Issue:* Setting identical start and end dates (e.g., March 7-7) behaves strangely.
+  - *Implementation Plan:*
+    - Update the DatePickerWithRange component to detect when start and end dates are the same
+    - Add an option or checkbox for "One-day event" that disables the end date picker and auto-sets it to match the start date
+    - Ensure backend validation handles one-day events correctly
+    - Simplify the UI flow for creating single-day events
