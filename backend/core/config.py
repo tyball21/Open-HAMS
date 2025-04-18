@@ -18,7 +18,7 @@ class Config(BaseSettings):
     ADMIN_EMAIL: str
 
     # Main Zoo Info
-    ZOO_NAME: str = "Hogle Zoo"
+    ZOO_NAME: str = "Utah's Hogle Zoo"
     ZOO_LOCATION: str = "Salt Lake City, UT"
 
     # AWS Credentials

@@ -51,10 +51,11 @@ export function SettingsPage() {
               </>
             )}
           </TabsList>
-          <div className="flex items-center gap-2 text-[#064E3B]">
+          <div className="flex items-center gap-2">
+            <p className="text-sm">Built by: </p>
             <p>Open HAMS</p>
             <Heart className="size-6" />
-            <p>Hogle Zoo</p>
+            <p>Utah's Hogle Zoo</p>
           </div>
         </div>
         <TabsContent value="general">

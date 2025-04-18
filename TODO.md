@@ -34,21 +34,26 @@ Brief one‑liner on purpose, vision, and success criteria.
 ## Components 🆕
 Break the product into logical chunks. Nest features → tasks.
 
-### Animal Management 🆕 P1
+### Animal Management ✅ P1
 - **Photo Upload:** Allow direct upload from computer. ✅ P1
   - *Issue:* Currently only online photos can be uploaded.
-  - *Note:* Implemented workaround using `(object as any)["image_filename"] || (object as any)["image"]` to handle type mismatch between backend model changes and frontend type definitions. ⚠️ Tech debt: Update OpenAPI types when schema stabilizes.
-- **Max Checkout Hours:** Remove field unless needed for defined auto-check-in. 🆕 P1
-  - *Issue:* Not needed for multi-day checkouts.
-- **Rest Time Requirement:** Remove mandatory field from animal creation. 🆕 P1
+  - *Note:* Backend routes updated to handle file uploads. Frontend workaround `(object as any)["image_filename"] || (object as any)["image"]` still in place due to potential schema drift. ⚠️ Tech debt: Update OpenAPI types when schema stabilizes.
+- **Max Checkout Hours:** Make field optional in database and model. ✅ P1
+  - *Issue:* Previously mandatory, not needed for multi-day checkouts.
+  - *Note:* Made nullable via migration `8484acd9b492`. Backend model `AnimalIn` updated. Frontend form schema (`animalSchema`) updated to optional.
+- **Rest Time Requirement:** Remove mandatory field from animal creation. ✅ P1
   - *Issue:* Determined by offsite status and handling frequency.
-- **Zoo Naming Consistency:** Update all "Hogle Zoo" instances to "Utah's Hogle Zoo." 💤 PENDING P1
+  - *Note:* Made optional in backend model (`AnimalIn`) and frontend schema (`animalSchema`).
+- **Zoo Naming Consistency:** Update all "Hogle Zoo" instances to "Utah's Hogle Zoo." ✅ P1
   - *Issue:* Inconsistent naming.
-- **Animal Creation Form Improvements:** 🆕 P1
-  - Make non-critical fields optional. 🆕 P1
-    - *Issue:* All fields currently required.
-  - Remove/modify auto-generated sequential ID display. 🆕 P1
+  - *Note:* Updated in config, frontend layouts, and README copyright notice.
+- **Animal Creation Form Improvements:** ✅ P1
+  - Make non-critical fields optional. ✅ P1
+    - *Issue:* Some fields were required.
+    - *Note:* `description`, `image`, `rest_time`, `max_daily_checkout_hours` made optional in frontend schema (`animalSchema`). Corresponding backend models also updated.
+  - Remove/modify auto-generated sequential ID display. ✅ P1
     - *Issue:* Potential user confusion with zoo's specific IDs.
+    - *Note:* Renamed column header in animals table to "System ID" for clarity.
 
 ### Event Management 🆕 P1
 - **Event Creation Adjustments:** 🆕 P1

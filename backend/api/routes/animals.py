@@ -3,13 +3,14 @@ from pathlib import Path
 import shutil
 import uuid
 
-from fastapi import APIRouter, HTTPException, Form, UploadFile, File
+from fastapi import APIRouter, HTTPException, Form, UploadFile, File, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 from sqlmodel import and_, col, desc, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-from api.deps import CurrentUser, SessionDep
+from api.deps import get_current_user, get_db_session
 from core.utils import snake_to_capital_case
 from db.animals import (
     get_all_animals,
@@ -40,6 +41,7 @@ from models import (
     EventWithDetailsAndComments,
     FeedEvent,
     RestingAnimal,
+    User,
     UserEvent,
     UserEventWithDetails,
     Zoo,
@@ -52,18 +54,18 @@ router = APIRouter(prefix="/animals", tags=["Animals"])
 
 @router.get("/")
 async def read_all_animals(
-    session: SessionDep, zoo_id: int | None = None
+    session: AsyncSession = Depends(get_db_session), zoo_id: int | None = None
 ) -> list[Animal]:
     return await get_all_animals(zoo_id, session)
 
 
 @router.get("/status")
-async def get_animal_status(session: SessionDep, zoo_id: int | None = None):
+async def get_animal_status(session: AsyncSession = Depends(get_db_session), zoo_id: int | None = None):
     return await get_animals_status(session, zoo_id=zoo_id)
 
 
 @router.get("/feed")
-async def get_feed(session: SessionDep) -> list[FeedEvent]:
+async def get_feed(session: AsyncSession = Depends(get_db_session)) -> list[FeedEvent]:
     req_actions = [
         "checked_in",
         "checked_out",
@@ -95,7 +97,7 @@ async def get_feed(session: SessionDep) -> list[FeedEvent]:
 
 
 @router.get("/{animal_id}")
-async def get_animal(animal_id: int, session: SessionDep) -> Animal:
+async def get_animal(animal_id: int, session: AsyncSession = Depends(get_db_session)) -> Animal:
     animal = await get_animal_by_id(animal_id, session)
     if not animal:
         raise HTTPException(status_code=404, detail="Animal not found")
@@ -103,7 +105,7 @@ async def get_animal(animal_id: int, session: SessionDep) -> Animal:
 
 
 @router.get("/{animal_id}/details")
-async def get_animal_details(animal_id: int, session: SessionDep) -> AnimalWithEvents:
+async def get_animal_details(animal_id: int, session: AsyncSession = Depends(get_db_session)) -> AnimalWithEvents:
     query = (
         select(
             Animal,
@@ -230,7 +232,7 @@ async def get_animal_details(animal_id: int, session: SessionDep) -> AnimalWithE
 
 
 @router.get("/details/resting")
-async def get_resting_animals(session: SessionDep) -> list[RestingAnimal]:
+async def get_resting_animals(session: AsyncSession = Depends(get_db_session)) -> list[RestingAnimal]:
     animals_status = await get_animals_status(session)
 
     resting_animals = list(
@@ -264,7 +266,7 @@ async def get_resting_animals(session: SessionDep) -> list[RestingAnimal]:
 
 
 @router.get("/details/checkedout")
-async def get_checked_out_animals(session: SessionDep) -> list[AnimalWithCurrentEvent]:
+async def get_checked_out_animals(session: AsyncSession = Depends(get_db_session)) -> list[AnimalWithCurrentEvent]:
     animals = await session.exec(
         select(Animal, AnimalEvent)
         .join(AnimalEvent)
@@ -305,8 +307,8 @@ async def get_checked_out_animals(session: SessionDep) -> list[AnimalWithCurrent
 
 @router.post("/")
 async def create_animal(
-    session: SessionDep,
-    current_user: CurrentUser,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_user),
     name: str = Form(...),
     species: str = Form(...),
     max_daily_checkouts: int = Form(...),
@@ -380,7 +382,7 @@ async def create_animal(
 
 
 @router.delete("/{animal_id}")
-async def delete_animal(animal_id: int, session: SessionDep, current_user: CurrentUser):
+async def delete_animal(animal_id: int, session: AsyncSession = Depends(get_db_session), current_user: User = Depends(get_current_user)):
     if not has_permission(current_user.role.permissions, "delete_animals"):
         raise HTTPException(
             status_code=401, detail="You are not authorized to perform this action"
@@ -430,8 +432,8 @@ async def delete_animal(animal_id: int, session: SessionDep, current_user: Curre
 @router.put("/{animal_id}")
 async def update_animal(
     animal_id: int,
-    session: SessionDep,
-    current_user: CurrentUser,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_user),
     name: str = Form(...),
     species: str = Form(...),
     max_daily_checkouts: int = Form(...),
@@ -530,9 +532,9 @@ async def update_animal(
 
 @router.put("/{animal_id}/unavailable")
 async def mark_animal_unavailable(
-    animal_id: int, session: SessionDep, current_user: CurrentUser
+    animal_id: int, session: AsyncSession = Depends(get_db_session), current_user: User = Depends(get_current_user)
 ):
-    if not has_permission(current_user.role.permissions, "make_animal_unavailable"):
+    if not await has_permission(current_user, "make_animal_unavailable", session):
         raise HTTPException(
             status_code=401, detail="You are not authorized to perform this action"
         )
@@ -545,9 +547,9 @@ async def mark_animal_unavailable(
 
 @router.put("/{animal_id}/available")
 async def mark_animal_available(
-    animal_id: int, session: SessionDep, current_user: CurrentUser
+    animal_id: int, session: AsyncSession = Depends(get_db_session), current_user: User = Depends(get_current_user)
 ):
-    if not has_permission(current_user.role.permissions, "make_animal_available"):
+    if not await has_permission(current_user, "make_animal_available", session):
         raise HTTPException(
             status_code=401, detail="You are not authorized to perform this action"
         )
@@ -558,7 +560,7 @@ async def mark_animal_available(
 
 @router.get("/{animal_id}/audits")
 async def get_animal_audits(
-    animal_id: int, session: SessionDep
+    animal_id: int, session: AsyncSession = Depends(get_db_session)
 ) -> list[AnimalAuditWithDetails]:
     animal = await get_animal_by_id(animal_id, session)
     if not animal:
@@ -579,7 +581,7 @@ async def get_animal_audits(
 
 @router.get("/{animal_id}/health-log")
 async def get_animal_health_logs(
-    animal_id: int, session: SessionDep
+    animal_id: int, session: AsyncSession = Depends(get_db_session)
 ) -> list[AnimalHealthLogWithDetails]:
     return await retrieve_animal_logs(animal_id, session)
 
@@ -588,8 +590,8 @@ async def get_animal_health_logs(
 async def create_animal_health_log(
     animal_id: int,
     body: AnimalHealthLogIn,
-    session: SessionDep,
-    current_user: CurrentUser,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_user),
 ):
     if not has_permission(current_user.role.permissions, "add_animal_health_log"):
         raise HTTPException(
@@ -627,8 +629,8 @@ async def update_animal_health_log(
     animal_id: int,
     log_id: int,
     body: AnimalHealthLogIn,
-    session: SessionDep,
-    current_user: CurrentUser,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_user),
 ):
     if not has_permission(current_user.role.permissions, "add_animal_health_log"):
         raise HTTPException(

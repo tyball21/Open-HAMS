@@ -27,7 +27,7 @@ export const animalTableColumns: ColumnDef<Animal>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ID" />
+      <DataTableColumnHeader column={column} title="System ID" />
     ),
     cell: ({ row }) => {
       return (

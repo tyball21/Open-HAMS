@@ -19,7 +19,7 @@ import { tiers } from "@/api/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LoadingDots, Spinner } from "../icons";
@@ -161,13 +161,20 @@ export function AnimalForm(props: {
     }
 
     // Determine endpoint and ID
-    const apiFunction = props.mode === "add" ? createAnimal : updateAnimal;
     const animalId = props.mode === "edit" ? props.animalId! : undefined;
 
     try {
-        // Call the API function with FormData
-        // NOTE: createAnimal/updateAnimal functions need to be updated to handle FormData
-        const res = await apiFunction(formData, animalId);
+        let res;
+        if (props.mode === "add") {
+            res = await createAnimal(formData); // Call createAnimal without animalId
+        } else {
+            // animalId is guaranteed to be a string here because props.mode === "edit"
+            if (!animalId) { // Add a type guard just in case
+              toast.error("Animal ID is missing for update.");
+              return;
+            }
+            res = await updateAnimal(formData, animalId); // Call updateAnimal with animalId
+        }
 
         if (res.status === 200) {
             // Assuming success response structure is consistent
