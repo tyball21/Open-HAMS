@@ -22,19 +22,20 @@ export function AuthLayout() {
           <p className="text-sm">Built by: </p>
           <p>Open HAMS</p>
           <Heart className="size-6" />
-          <p>Hogle Zoo</p>
+          <p>Utah's Hogle Zoo</p>
 
           <Link to="/dashboard" className="ml-auto">
             home
           </Link>
         </div>
-        <div className="flex items-center gap-2 border-t pt-2">
-          <p className="text-[#059669]">© 2024 Eleganza Homes</p>
-          <Link to="/terms" className="ml-auto text-[#064E3B]">
-            Terms
-          </Link>
-          <Link to="/terms" className="ml-4 text-[#064E3B]">
-            Privacy
+        <div className="flex items-center gap-4 border-t pt-2">
+          <Link 
+            to="https://github.com/tyball21/Open-HAMS" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#064E3B] hover:underline"
+          >
+            GitHub
           </Link>
         </div>
       </footer>

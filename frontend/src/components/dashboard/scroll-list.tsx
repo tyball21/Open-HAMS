@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { LoadingDots } from "../icons";
 
 type Props = {
-  title: string;
+  title: React.ReactNode;
   isLoading?: boolean;
   children: React.ReactNode;
 };

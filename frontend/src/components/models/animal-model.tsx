@@ -142,33 +142,67 @@ export function AnimalForm(props: {
   if (props.mode === "edit" && !props.animalId) return null;
 
   async function onSubmit(values: AnimalSchema) {
-    console.log(values);
+    console.log("Form values (before FormData):", values);
 
-    var res;
-    if (props.mode === "add") {
-      res = await createAnimal(values);
-    } else {
-      res = await updateAnimal(values, props.animalId!);
+    // Create FormData
+    const formData = new FormData();
+
+    // Append all fields from the form values
+    // Need to handle type conversions (e.g., numbers, booleans) as FormData sends strings
+    Object.entries(values).forEach(([key, value]) => {
+      if (key !== 'image') { // Don't append the old image URL/value
+        formData.append(key, String(value)); // Convert all values to string for FormData
+      }
+    });
+
+    // Append the image file if selected
+    if (image) {
+      formData.append("image", image);
     }
 
-    if (res.status === 200) {
-      toast.success(res.data.message);
-      queryClient.invalidateQueries(["animals"]);
+    // Determine endpoint and ID
+    const animalId = props.mode === "edit" ? props.animalId! : undefined;
 
-      if (props.mode === "edit") {
-        queryClient.invalidateQueries(["animal", props.animalId!]);
-        queryClient.invalidateQueries(["animal_details", props.animalId!]);
-      }
+    try {
+        let res;
+        if (props.mode === "add") {
+            res = await createAnimal(formData); // Call createAnimal without animalId
+        } else {
+            // animalId is guaranteed to be a string here because props.mode === "edit"
+            if (!animalId) { // Add a type guard just in case
+              toast.error("Animal ID is missing for update.");
+              return;
+            }
+            res = await updateAnimal(formData, animalId); // Call updateAnimal with animalId
+        }
 
-      props.setOpen(false);
-    } else {
-      toast.error(res.data.detail);
+        if (res.status === 200) {
+            // Assuming success response structure is consistent
+            toast.success(res.data.message || "Animal saved successfully!"); // Use a default message if needed
+            queryClient.invalidateQueries(["animals"]);
+
+            if (props.mode === "edit") {
+                queryClient.invalidateQueries(["animal", props.animalId!]);
+                queryClient.invalidateQueries(["animal_details", props.animalId!]);
+            }
+
+            props.setOpen(false);
+            form.reset(); // Reset form after successful submission
+            setImage(null); // Clear selected image
+        } else {
+            // Handle potential error structure differences
+            toast.error(res.data.detail || "An error occurred.");
+        }
+    } catch (error) {
+        console.error("Error submitting animal form:", error);
+        toast.error("An unexpected error occurred while saving.");
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
+      {/* Prevent default browser form submission */}
+      <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(onSubmit)(); }} className="space-y-4 px-1">
         <FormField
           control={form.control}
           name="name"
@@ -202,59 +236,14 @@ export function AnimalForm(props: {
             <FormItem>
               <FormLabel>Image</FormLabel>
               <FormControl>
-                <div className="flex w-full items-center justify-between gap-3">
-                  {isImageUpload ? (
-                    <Input
-                      type="file"
-                      placeholder="Select image"
-                      className="w-full"
-                      onChange={(event) => {
-                        setImage(event.target.files?.[0] || null);
-                        // setIsImageUpload(true);
-                      }}
-                    />
-                  ) : (
-                    <Input
-                      {...field}
-                      placeholder="Enter image url or upload"
-                      className="w-full"
-                    />
-                  )}
-                  <Button
-                    size="sm"
-                    onClick={async (e) => {
-                      e.preventDefault();
-
-                      if (isImageUploading) return;
-
-                      if (isImageUpload && image) {
-                        setIsImageUploading(true);
-
-                        const res = await uploadFile(image);
-                        if (res.status === 200) {
-                          setIsImageUpload(false);
-                          form.setValue("image", res.data.file_url);
-                          toast.success("Image uploaded successfully");
-                        } else {
-                          toast.error(res.data.detail);
-                        }
-                        setIsImageUploading(false);
-                      } else if (isImageUpload && !image) {
-                        setIsImageUpload(false);
-                      } else {
-                        setIsImageUpload(true);
-                      }
-                    }}
-                    disabled={isImageUploading}
-                  >
-                    {isImageUploading && <Spinner className="mr-2 size-4" />}
-                    {isImageUpload && image
-                      ? "Save"
-                      : isImageUpload && !image
-                        ? "Cancel"
-                        : "Upload"}
-                  </Button>
-                </div>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    setImage(event.target.files?.[0] || null);
+                  }}
+                  className="w-full"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -392,7 +381,7 @@ export function AnimalForm(props: {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {zoos?.map((zoo) => (
+                  {zoos?.map((zoo: { id: number; name: string }) => (
                     <SelectItem key={zoo.id} value={zoo.id.toString()}>
                       {zoo.name}
                     </SelectItem>

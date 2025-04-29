@@ -290,7 +290,7 @@ export function EditEventForm({
             <div className="my-4 flex w-full items-center justify-start">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant={"destructive"} size="sm" className="">
+                  <Button variant="destructive" className="w-full" size="sm">
                     Delete Event
                   </Button>
                 </AlertDialogTrigger>
@@ -301,15 +301,14 @@ export function EditEventForm({
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      event <strong>{eventDetails.event.name}</strong>.
+                      the event.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <Button
+                      variant="destructive"
                       onClick={async () => {
-                        console.log("Cancel");
-
                         const res = await deleteEvent(
                           eventDetails.event.id.toString(),
                         );
@@ -318,12 +317,11 @@ export function EditEventForm({
                           queryClient.invalidateQueries({
                             queryKey: ["events"],
                           });
-                          navigate(0);
+                          navigate("/dashboard");
                         } else {
                           toast.error(res.data.detail);
                         }
                       }}
-                      variant={"destructive"}
                     >
                       Delete
                     </Button>

@@ -15,13 +15,13 @@ export async function getAnimals() {
   return res.data as Animal[];
 }
 
-export async function createAnimal(values: AnimalSchema) {
-  const res = await instance.post("/animals", values);
+export async function createAnimal(formData: FormData) {
+  const res = await instance.post("/animals", formData);
   return res;
 }
 
-export async function updateAnimal(values: AnimalSchema, animalId: string) {
-  const res = await instance.put(`/animals/${animalId}`, values);
+export async function updateAnimal(formData: FormData, animalId: string) {
+  const res = await instance.put(`/animals/${animalId}`, formData);
   return res;
 }
 

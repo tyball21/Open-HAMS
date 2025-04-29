@@ -180,10 +180,10 @@ class AnimalEvent(SQLModel, table=True):
 class AnimalIn(SQLModel):
     name: str
     species: str
-    image: str | None = Field(default=None)
+    image_filename: str | None = Field(default=None)
     max_daily_checkouts: int
-    max_daily_checkout_hours: int
-    rest_time: float
+    max_daily_checkout_hours: int | None = Field(default=None)
+    rest_time: float | None = Field(default=None)
     description: str | None = Field(default=None)
     tier: int = Field(default=1)
 
@@ -207,7 +207,7 @@ class AnimalIn(SQLModel):
                 {
                     "name": "Lion",
                     "species": "Panthera leo",
-                    "image": "https://example.com/lion.jpg",
+                    "image_filename": "https://example.com/lion.jpg",
                     "max_daily_checkouts": 10,
                     "max_daily_checkout_hours": 2,
                     "rest_time": 1.5,
@@ -223,6 +223,7 @@ class AnimalIn(SQLModel):
 
 class Animal(AnimalIn, table=True):
     id: int = Field(primary_key=True)
+    max_daily_checkout_hours: int | None = Field(default=None, nullable=True)
 
     created_at: datetime = created_at_field()
     updated_at: datetime = updated_at_field()
@@ -261,7 +262,7 @@ class EventType(EventTypeIn, table=True):
 
 class EventIn(SQLModel):
     name: str
-    description: str
+    description: str | None = None
     start_at: datetime = Field(
         sa_column=sa.Column(
             type_=TIMESTAMP(timezone=True),

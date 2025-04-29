@@ -371,6 +371,59 @@ async def delete_event(event_id: int, session: SessionDep, current_user: Current
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
+    # Check if any animals are currently checked out for this event
+    animal_links = await session.exec(
+        select(AnimalEvent).where(
+            AnimalEvent.event_id == event_id,
+            AnimalEvent.checked_out.is_not(None),  # Animals that have been checked out
+            AnimalEvent.checked_in.is_(None)       # But not yet checked in
+        ).options(joinedload(AnimalEvent.animal))  # type: ignore
+    )
+    animal_links = list(animal_links.all())  # type: ignore
+    
+    # Auto check-in any animals that are currently checked out
+    if animal_links:
+        # Get list of animal IDs to check in
+        checked_out_animal_ids = [animal_link.animal_id for animal_link in animal_links]
+        
+        # Mark animals as checked in
+        now = datetime.now(UTC)
+        for animal_link in animal_links:
+            animal_link.checked_in = now
+            animal_link.user_in_id = current_user.id
+            animal_link.duration = now - animal_link.checked_out  # type: ignore
+            session.add(animal_link)
+        
+        # Update animals status to checked_in
+        await update_animals_status(checked_out_animal_ids, "checked_in", session)
+        
+        # Create audit logs for auto check-in
+        for animal_id in checked_out_animal_ids:
+            # Audit log for auto check-in
+            await log_audit(
+                session=session,
+                animal_id=animal_id,
+                changed_by=current_user.id,
+                action="checked_in",
+                commit=False,
+                description=f"Animal automatically checked in due to event deletion of '{event.name}'",
+            )
+
+            # Audit log for status change
+            await log_audit(
+                session=session,
+                animal_id=animal_id,
+                changed_by=current_user.id,
+                action="animal_status_changed",
+                commit=False,
+                changed_field="status",
+                old_value="checked_out",
+                new_value="checked_in",
+                description=f"Animal status changed due to automatic check-in from event deletion of '{event.name}'",
+            )
+        
+        await session.commit()
+
     # delete all user links
     user_links = await session.exec(
         select(UserEvent).where(UserEvent.event_id == event_id)
@@ -379,10 +432,10 @@ async def delete_event(event_id: int, session: SessionDep, current_user: Current
         await session.delete(user_link)
 
     # delete all animal links
-    animal_links = await session.exec(
+    all_animal_links = await session.exec(
         select(AnimalEvent).where(AnimalEvent.event_id == event_id)
     )
-    for animal_link in animal_links:
+    for animal_link in all_animal_links:
         await session.delete(animal_link)
 
     await session.delete(event)

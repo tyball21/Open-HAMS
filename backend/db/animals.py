@@ -90,8 +90,9 @@ async def get_animals_status(
                 status = "unavailable"
                 status_description = "Daily Check-out limit reached"
 
+            # Restore block with None check
             # if max daily checkout duration reached
-            elif daily_event_duration and daily_event_duration >= timedelta(
+            elif animal.max_daily_checkout_hours is not None and daily_event_duration and daily_event_duration >= timedelta(
                 hours=animal.max_daily_checkout_hours
             ):
                 status = "unavailable"
@@ -245,7 +246,7 @@ def get_action(field: str) -> AuditActions:
             return "max_checkout_hours_changed"
         case "rest_time":
             return "rest_time_changed"
-        case "image":
+        case "image_filename":
             return "image_updated"
         case "tier":
             return "tier_changed"
@@ -301,9 +302,13 @@ async def validate_event_clashes(
     )
     clashing_animals = list(clashing_animals.all())
     if clashing_animals:
+        # Pre-calculate parts for clarity
+        animal_names = ", ".join(clashing_animals)
+        plural_s = "s" if len(clashing_animals) > 1 else ""
         raise HTTPException(
             status_code=400,
-            detail=f"Animal{"" if len(clashing_animals) == 1 else "s"} {', '.join([animal for animal in clashing_animals])} is already assigned to an event during this time",
+            # Use pre-calculated parts in the f-string
+            detail=f"Animal{plural_s} {animal_names} is already assigned to an event during this time",
         )
 
     return None
