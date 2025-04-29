@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, isToday, isFuture, isBefore, isAfter, startOfToday } from "date-fns";
 import * as z from "zod";
 
 export const eventSchema = z.object({
@@ -24,16 +24,73 @@ export const eventSchema = z.object({
     .refine((data) => data.from <= data.to!, {
       message: "Ending date must be after starting date",
     })
-    .refine((data) => data.from > addDays(new Date(), -1), {
-      message: "Starting date must be in the future",
-    })
-    .refine((data) => data.to! > addDays(new Date(), -1), {
-      message: "Ending date must be in the future",
-    }),
+    .refine((data) => {
+      // Allow future dates unconditionally
+      if (isFuture(data.from) && !isToday(data.from)) {
+        return true;
+      }
+      
+      // For today, we'll validate the actual start time when combined with the selected time
+      if (isToday(data.from)) {
+        return true; // We'll validate the full date+time combination separately
+      }
+      
+      return false;
+    }, "Starting date must be today or in the future")
+    .refine((data) => {
+      // Allow future dates unconditionally for end date
+      if (isFuture(data.to!) && !isToday(data.to!)) {
+        return true;
+      }
+      
+      // For today, we'll validate the combined date+time
+      if (isToday(data.to!)) {
+        return true;
+      }
+      
+      return false;
+    }, "Ending date must be today or in the future"),
   startTime: z.date({ message: "Please select a time" }),
   endTime: z.date({ message: "Please select a time" }),
   zoo_id: z.string({ message: "Please select a zoo" }),
   event_type_id: z.string({ message: "Please select an event type" }),
+}).superRefine((data, ctx) => {
+  // Only evaluate this for same-day events
+  if (isToday(data.date.from) && data.startTime) {
+    // Create a full date+time object for comparison
+    const now = new Date();
+    const eventStart = new Date(
+      data.date.from.getFullYear(),
+      data.date.from.getMonth(),
+      data.date.from.getDate(),
+      data.startTime.getHours(),
+      data.startTime.getMinutes(),
+      data.startTime.getSeconds(),
+    );
+    
+    // For same-day events, ensure the start time is in the future
+    if (isBefore(eventStart, now)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "For events today, start time must be in the future",
+        path: ["startTime"],
+      });
+    }
+  }
+  
+  // Validate that for same-day events, end time is after start time
+  if (data.date.from && data.date.to && 
+      data.date.from.getTime() === data.date.to.getTime() &&
+      data.startTime && data.endTime) {
+    
+    if (data.endTime <= data.startTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "End time must be after start time for same-day events",
+        path: ["endTime"],
+      });
+    }
+  }
 });
 
 export function transformEventSchema(data: EventSchema) {
