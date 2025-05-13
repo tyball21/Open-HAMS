@@ -1,6 +1,6 @@
 from typing import Literal, get_args
 
-from psycopg2 import IntegrityError
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
