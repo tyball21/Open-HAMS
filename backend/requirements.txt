@@ -32,7 +32,7 @@ numpy==2.0.1
 orjson==3.10.3
 pandas==2.2.2
 passlib==1.7.4
-psycopg2==2.9.9
+# psycopg2==2.9.9 # Removed/Commented out for async compatibility
 pyasn1==0.6.0
 pycparser==2.22
 pydantic==2.7.1
