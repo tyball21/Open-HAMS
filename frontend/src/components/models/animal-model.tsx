@@ -151,12 +151,14 @@ export function AnimalForm(props: {
     formData.append("name", values.name);
     formData.append("species", values.species);
     formData.append("max_daily_checkouts", values.max_daily_checkouts.toString());
-    formData.append("max_daily_checkout_hours", values.max_daily_checkout_hours?.toString() || "0");
-    formData.append("rest_time", values.rest_time?.toString() || "0");
+    if (values.max_daily_checkout_hours !== undefined && values.max_daily_checkout_hours !== null) {
+      formData.append("max_daily_checkout_hours", values.max_daily_checkout_hours.toString());
+    }
+    formData.append("rest_time", (values.rest_time || 0).toString());
     formData.append("handling_enabled", values.handling_enabled.toString());
     formData.append("zoo_id", values.zoo_id);
     formData.append("tier", values.tier);
-    if (values.description) {
+    if (values.description && values.description.trim()) {
       formData.append("description", values.description);
     }
 
