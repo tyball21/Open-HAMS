@@ -112,7 +112,7 @@ export function AnimalForm(props: {
           name: "",
           species: "",
           image: "",
-          max_daily_checkouts: 0,
+          max_daily_checkouts: 1,
           max_daily_checkout_hours: 0,
           rest_time: 0,
           description: "",
@@ -147,13 +147,18 @@ export function AnimalForm(props: {
     // Create FormData
     const formData = new FormData();
 
-    // Append all fields from the form values
-    // Need to handle type conversions (e.g., numbers, booleans) as FormData sends strings
-    Object.entries(values).forEach(([key, value]) => {
-      if (key !== 'image') { // Don't append the old image URL/value
-        formData.append(key, String(value)); // Convert all values to string for FormData
-      }
-    });
+    // Append fields with proper type handling for FastAPI
+    formData.append("name", values.name);
+    formData.append("species", values.species);
+    formData.append("max_daily_checkouts", values.max_daily_checkouts.toString());
+    formData.append("max_daily_checkout_hours", values.max_daily_checkout_hours?.toString() || "0");
+    formData.append("rest_time", values.rest_time?.toString() || "0");
+    formData.append("handling_enabled", values.handling_enabled.toString());
+    formData.append("zoo_id", values.zoo_id);
+    formData.append("tier", values.tier);
+    if (values.description) {
+      formData.append("description", values.description);
+    }
 
     // Append the image file if selected
     if (image) {
