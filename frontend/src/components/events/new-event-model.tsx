@@ -286,7 +286,7 @@ export function NewEventCard({
                     toRender: (
                       <>
                         <Avatar className="size-5">
-                          <AvatarImage src={animal_info.animal.image_filename ? `/static/animal_images/${animal_info.animal.image_filename}` : undefined} />
+                          <AvatarImage src={animal_info.animal.image ? `/static/animal_images/${animal_info.animal.image}` : undefined} />
                           <AvatarFallback>
                             {getInitials(animal_info.animal.name)}
                           </AvatarFallback>
@@ -321,12 +321,12 @@ export function NewEventCard({
                     );
                     return (
                       <AvatarWithTooltip
-                        src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : ""}
+                        src={animal?.animal.image ? `/static/animal_images/${animal.animal.image}` : ""}
                         name={animal?.animal.name}
                       >
                         <div className="flex items-center gap-2">
                           <Avatar className="size-8">
-                            <AvatarImage src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : undefined} />
+                            <AvatarImage src={animal?.animal.image ? `/static/animal_images/${animal.animal.image}` : undefined} />
                             <AvatarFallback>
                               {getInitials(animal?.animal.name!)}
                             </AvatarFallback>
@@ -382,18 +382,33 @@ export function NewEventCard({
                   >
                     <FormControl>
                       <SelectTrigger className="w-40">
-                        <SelectValue placeholder="Select Event Type" />
+                        <SelectValue placeholder={
+                          eventTypes && eventTypes.length === 0 
+                            ? "No event types available" 
+                            : "Select Event Type"
+                        } />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {eventTypes?.map((eventType: EventType) => (
-                        <SelectItem
-                          key={eventType.id}
-                          value={eventType.id.toString()}
-                        >
-                          {eventType.name}
-                        </SelectItem>
-                      ))}
+                      {eventTypes && eventTypes.length === 0 ? (
+                        <div className="p-3 text-center">
+                          <p className="text-sm text-muted-foreground mb-2">
+                            No event types exist yet.
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Go to Settings → Admin → Event Types to create one
+                          </p>
+                        </div>
+                      ) : (
+                        eventTypes?.map((eventType: EventType) => (
+                          <SelectItem
+                            key={eventType.id}
+                            value={eventType.id.toString()}
+                          >
+                            {eventType.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

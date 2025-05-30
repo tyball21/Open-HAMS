@@ -11,7 +11,7 @@ export const animalSchema = z.object({
     .max(500)
     .optional()
     .or(z.literal('')),
-  image: z.string().url().optional().or(z.literal('')),
+  image: z.any().optional(),
   handling_enabled: z.boolean(),
   max_daily_checkout_hours: z.preprocess(
     (val) => (val === '' || val == null ? 0 : Number(val)),
