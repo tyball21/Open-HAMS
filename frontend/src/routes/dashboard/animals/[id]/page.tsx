@@ -5,13 +5,14 @@ import {
   useAnimalHealthLog,
   useUser,
 } from "@/api/queries";
+import { API_URL } from "@/api/utils";
 import { EventsList } from "@/components/events/events-list";
 import { NewHealthLogModel } from "@/components/models/health-log-model";
 import { Sidebar } from "@/components/sidebar";
 import { animalAuditTableColumns } from "@/components/tables/animal-audit-table/cols";
 import { animalHealthLogTableColumns } from "@/components/tables/animal-health-table/cols";
 import { DataTable } from "@/components/tables/table-commons/data-table";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDetails, CardHeading } from "@/components/ui/card";
@@ -53,7 +54,11 @@ export function AnimalDetailsPage() {
       <section className="flex h-full w-full flex-col gap-4 pb-4  pt-8 lg:flex-row lg:gap-8 lg:px-12">
         <div className="flex min-h-full w-full flex-col gap-4 rounded-md bg-white p-6 pt-16 shadow-sm lg:w-1/3">
           <Avatar className="mx-auto size-16 lg:size-32">
-            <AvatarImage src={data.animal.image!} />
+            <AvatarImage 
+              src={(data.animal as any).image_filename ? `${API_URL}/static/animal_images/${(data.animal as any).image_filename}` : undefined} 
+              alt={data.animal.name}
+            />
+            <AvatarFallback>{data.animal.name[0]}</AvatarFallback>
           </Avatar>
           <h1 className="text-center text-2xl text-black">
             {data.animal.name}

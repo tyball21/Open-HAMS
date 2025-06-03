@@ -21,11 +21,11 @@ class Config(BaseSettings):
     ZOO_NAME: str = "Utah's Hogle Zoo"
     ZOO_LOCATION: str = "Salt Lake City, UT"
 
-    # AWS Credentials
-    AWS_ACCESS_KEY_ID: str
-    AWS_SECRET_ACCESS_KEY: str
-    AWS_REGION: str
-    AWS_BUCKET_NAME: str
+    # AWS Credentials - Optional for local development
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+    AWS_REGION: str = "us-west-2"
+    AWS_BUCKET_NAME: str = ""
 
     # RESEND API KEY
     RESEND_API_KEY: str

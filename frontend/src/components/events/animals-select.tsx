@@ -1,4 +1,5 @@
 import { useAnimalStatus } from "@/api/queries";
+import { API_URL } from "@/api/utils";
 import { AnimalStatus } from "@/api/animals";
 import { formatDate, formatTime } from "@/utils";
 import { AnimalEventWithDetails } from "@/utils/types";
@@ -29,7 +30,10 @@ export function AnimalsSelect(props: {
         toRender: (
           <>
             <Avatar className="size-5">
-              <AvatarImage src={animal_info.animal.image_filename ? `/static/animal_images/${animal_info.animal.image_filename}` : undefined} />
+              <AvatarImage src={(() => {
+                const imageField = (animal_info.animal as any)["image_filename"] || (animal_info.animal as any)["image"];
+                return imageField ? `${API_URL}/static/animal_images/${imageField}` : undefined;
+              })()} />
             </Avatar>
             <span className="font-extralightlight text-xs text-foreground">
               {animal_info.animal.name}
@@ -64,10 +68,16 @@ export function AnimalsSelect(props: {
           (animalDetails) => animalDetails.animal.id.toString() === value,
         );
         return (
-          <AvatarWithTooltip src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : ""}>
+          <AvatarWithTooltip src={(() => {
+            const imageField = (animal?.animal as any)?.["image_filename"] || (animal?.animal as any)?.["image"];
+            return imageField ? `${API_URL}/static/animal_images/${imageField}` : "";
+          })()}>
             <div className="flex items-center gap-2">
               <Avatar className="size-8">
-                <AvatarImage src={animal?.animal.image_filename ? `/static/animal_images/${animal.animal.image_filename}` : undefined} />
+                <AvatarImage src={(() => {
+                  const imageField = (animal?.animal as any)?.["image_filename"] || (animal?.animal as any)?.["image"];
+                  return imageField ? `${API_URL}/static/animal_images/${imageField}` : undefined;
+                })()} />
               </Avatar>
               <span className="text-md font-semibold">
                 {animal?.animal.name}

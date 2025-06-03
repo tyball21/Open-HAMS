@@ -6,6 +6,7 @@ import { Animal } from "@/utils/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { DataTableColumnHeader } from "../table-commons/col-headers";
+import { API_URL } from "@/api/utils";
 
 export const animalTableColumns: ColumnDef<Animal>[] = [
   {
@@ -13,7 +14,7 @@ export const animalTableColumns: ColumnDef<Animal>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
     cell: ({ row }) => {
       const imageField = (row.original as any)["image_filename"] || (row.original as any)["image"];
-      const imageUrl = imageField ? `/static/animal_images/${imageField}` : undefined;
+      const imageUrl = imageField ? `${API_URL}/static/animal_images/${imageField}` : undefined;
       return (
         <Avatar className="m-2">
           <AvatarImage src={imageUrl} alt={row.original.name} />

@@ -35,6 +35,19 @@ Brief one‑liner on purpose, vision, and success criteria.
 Break the product into logical chunks. Nest features → tasks.
 
 ### Animal Management ✅ P1
+- **Animal Creation 422 Error Fix:** Resolve "Unprocessable Entity" errors when creating animals. ✅ P0
+  - *Issue:* Frontend sending FormData but axios forcing `Content-Type: application/json`, causing validation failures.
+  - *Root Causes Fixed:*
+    - FormData/JSON content-type mismatch in axios configuration
+    - Permission function signature errors (`has_permission` parameters)
+    - Audit logging parameter mismatch (`user_id` vs `changed_by`)
+    - Greenlet async context issues in audit logging
+  - *Note:* Fixed in axios.ts, animals.py routes. All animals now create successfully. Completed 2024-12-16.
+- **Animal Image Display Fix:** Images not showing in frontend UI. ✅ P1
+  - *Issue:* Frontend using relative URLs (`/static/`) pointing to frontend server instead of backend.
+  - *Fix:* Updated all image references to use `${API_URL}/static/animal_images/` for environment-agnostic URLs.
+  - *Components Updated:* animals-table/cols.tsx, animal details page, event models, animals-select.tsx
+  - *Note:* Works with both local development and production S3 deployments. Completed 2024-12-16.
 - **Photo Upload:** Allow direct upload from computer. ✅ P1
   - *Issue:* Currently only online photos can be uploaded.
   - *Note:* Backend routes updated to handle file uploads. Frontend workaround `(object as any)["image_filename"] || (object as any)["image"]` still in place due to potential schema drift. ⚠️ Tech debt: Update OpenAPI types when schema stabilizes.
