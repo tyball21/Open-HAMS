@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 import uuid
 
-from fastapi import APIRouter, HTTPException, Form, UploadFile, File, Depends
+from fastapi import APIRouter, HTTPException, Form, UploadFile, File, Depends, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -47,9 +47,46 @@ from models import (
     Zoo,
 )
 
-IMAGE_DIR = Path("backend/static/animal_images") # Define the directory for animal images
+IMAGE_DIR = Path("static/animal_images") # Define the directory for animal images
 
 router = APIRouter(prefix="/animals", tags=["Animals"])
+
+
+def parse_form_boolean(value: str | bool) -> bool:
+    """Convert FormData boolean string to actual boolean"""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.lower() in ('true', '1', 'yes', 'on')
+    return False
+
+
+def parse_form_int(value: str | int | None) -> int | None:
+    """Convert FormData string to int, handling None and empty strings"""
+    if value is None or value == '':
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError:
+            return None
+    return None
+
+
+def parse_form_float(value: str | float | None) -> float | None:
+    """Convert FormData string to float, handling None and empty strings"""
+    if value is None or value == '':
+        return None
+    if isinstance(value, float):
+        return value
+    if isinstance(value, str):
+        try:
+            return float(value)
+        except ValueError:
+            return None
+    return None
 
 
 @router.get("/")
@@ -311,29 +348,53 @@ async def create_animal(
     current_user: User = Depends(get_current_user),
     name: str = Form(...),
     species: str = Form(...),
-    max_daily_checkouts: int = Form(...),
-    max_daily_checkout_hours: int | None = Form(None),
-    rest_time: float = Form(...),
-    handling_enabled: bool = Form(...),
-    zoo_id: int = Form(...),
-    description: str | None = Form(None),
-    tier: int = Form(1),
-    image: UploadFile | None = File(None),
+    max_daily_checkouts: str = Form(...),
+    max_daily_checkout_hours: str = Form(""),
+    rest_time: str = Form(""),
+    handling_enabled: str = Form(...),
+    zoo_id: str = Form(...),
+    description: str = Form(""),
+    tier: str = Form("1"),
+    image: UploadFile = File(None),
 ):
-    if not await has_permission(current_user, "create_animal", session):
+    # Check permissions first
+    if not has_permission(current_user.role.permissions, "add_animal"):
         raise HTTPException(status_code=403, detail="Not enough permissions")
+    
+    # Validate and parse required fields
+    if not name or name.strip() == "":
+        raise HTTPException(status_code=422, detail="Name is required")
+    if not species or species.strip() == "":
+        raise HTTPException(status_code=422, detail="Species is required")
+        
+    # Parse required integer fields
+    parsed_max_daily_checkouts = parse_form_int(max_daily_checkouts)
+    if parsed_max_daily_checkouts is None or parsed_max_daily_checkouts <= 0:
+        raise HTTPException(status_code=422, detail="Max daily checkouts must be a positive integer")
+    
+    parsed_zoo_id = parse_form_int(zoo_id)
+    if parsed_zoo_id is None:
+        raise HTTPException(status_code=422, detail="Zoo ID must be a valid integer")
+    
+    # Parse boolean field
+    parsed_handling_enabled = parse_form_boolean(handling_enabled)
+    
+    # Parse optional fields
+    parsed_max_daily_checkout_hours = parse_form_int(max_daily_checkout_hours)
+    parsed_rest_time = parse_form_float(rest_time)
+    parsed_tier = parse_form_int(tier) or 1  # Default to 1 if not provided
 
-    # Ensure image directory exists
-    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
-
+    # Handle image upload
     image_filename_to_save = None
-    if image:
+    if image and image.filename and image.size > 0:
         if not image.content_type or not image.content_type.startswith("image/"):
-            raise HTTPException(
-                status_code=400, detail="Invalid file type. Only images are allowed."
-            )
+            raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
+        
+        # Ensure image directory exists
+        IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+        
         # Generate unique filename
-        extension = Path(image.filename).suffix if image.filename else ".jpg" # Default extension
+        extension = Path(image.filename).suffix if image.filename else ".jpg"
         unique_filename = f"{uuid.uuid4()}{extension}"
         file_location = IMAGE_DIR / unique_filename
 
@@ -343,42 +404,57 @@ async def create_animal(
                 shutil.copyfileobj(image.file, buffer)
             image_filename_to_save = unique_filename
         except Exception as e:
-            # Log error appropriately
-            print(f"Error saving file: {e}") 
             raise HTTPException(status_code=500, detail="Error saving image file.")
         finally:
             image.file.close()
 
-    # Create AnimalIn data (or directly Animal instance)
-    animal_data = AnimalIn(
-        name=name,
-        species=species,
-        max_daily_checkouts=max_daily_checkouts,
-        max_daily_checkout_hours=max_daily_checkout_hours,
-        rest_time=rest_time,
-        handling_enabled=handling_enabled,
-        zoo_id=zoo_id,
-        description=description,
-        tier=tier,
-        image_filename=image_filename_to_save, # Use the saved filename
-        checked_in=True, # Default value when creating
-        status="checked_in" # Default value when creating
-    )
+    # Create the animal
+    try:
+        # Get user ID before any async operations to avoid greenlet issues
+        user_id = current_user.id
+        
+        animal_data = AnimalIn(
+            name=name.strip(),
+            species=species.strip(),
+            max_daily_checkouts=parsed_max_daily_checkouts,
+            max_daily_checkout_hours=parsed_max_daily_checkout_hours,
+            rest_time=parsed_rest_time,
+            handling_enabled=parsed_handling_enabled,
+            zoo_id=parsed_zoo_id,
+            description=description.strip() if description else None,
+            tier=parsed_tier,
+            image_filename=image_filename_to_save,
+            daily_checkout_count=0,
+            daily_checkout_duration=timedelta(hours=0),
+            last_checkin_time=None,
+            checked_in=True,
+            status="checked_in"
+        )
+        
+        # Create Animal object directly from the AnimalIn data
+        db_animal = Animal(**animal_data.model_dump())
+        
+        session.add(db_animal)
+        await session.commit()
+        await session.refresh(db_animal)
 
-    db_animal = Animal.model_validate(animal_data)
+        # Log audit with the user_id we captured earlier
+        try:
+            await log_audit(
+                session=session,
+                animal_id=db_animal.id,
+                changed_by=user_id,
+                action="created",
+            )
+        except Exception as audit_error:
+            # Don't fail the whole operation if audit logging fails
+            pass
 
-    session.add(db_animal)
-    await session.commit()
-    await session.refresh(db_animal)
-
-    await log_audit(
-        session=session,
-        user_id=current_user.id,
-        animal_id=db_animal.id,
-        action="created",
-    )
-
-    return db_animal
+        return db_animal
+        
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{animal_id}")
@@ -438,7 +514,7 @@ async def update_animal(
     species: str = Form(...),
     max_daily_checkouts: int = Form(...),
     max_daily_checkout_hours: int | None = Form(None),
-    rest_time: float = Form(...),
+    rest_time: float | None = Form(None),  # Changed to optional to match create_animal
     handling_enabled: bool = Form(...),
     zoo_id: int = Form(...),
     description: str | None = Form(None),
@@ -447,7 +523,7 @@ async def update_animal(
     status: str | None = Form(None), # Keep status if provided
     image: UploadFile | None = File(None), # Changed from animal_update: AnimalIn
 ):
-    if not await has_permission(current_user, "update_animal", session):
+    if not has_permission(current_user.role.permissions, "update_animal"):
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     db_animal = await get_animal_by_id(animal_id, session)
@@ -521,8 +597,8 @@ async def update_animal(
     if changed_fields:
       await log_audit(
           session=session,
-          user_id=current_user.id,
           animal_id=db_animal.id,
+          changed_by=current_user.id,
           action="updated",
           description=f"Fields updated: {', '.join(changed_fields)}"
       )
@@ -534,7 +610,7 @@ async def update_animal(
 async def mark_animal_unavailable(
     animal_id: int, session: AsyncSession = Depends(get_db_session), current_user: User = Depends(get_current_user)
 ):
-    if not await has_permission(current_user, "make_animal_unavailable", session):
+    if not has_permission(current_user.role.permissions, "make_animal_unavailable"):
         raise HTTPException(
             status_code=401, detail="You are not authorized to perform this action"
         )
@@ -549,7 +625,7 @@ async def mark_animal_unavailable(
 async def mark_animal_available(
     animal_id: int, session: AsyncSession = Depends(get_db_session), current_user: User = Depends(get_current_user)
 ):
-    if not await has_permission(current_user, "make_animal_available", session):
+    if not has_permission(current_user.role.permissions, "make_animal_available"):
         raise HTTPException(
             status_code=401, detail="You are not authorized to perform this action"
         )

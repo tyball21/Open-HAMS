@@ -10,12 +10,19 @@ from core.config import settings
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    region_name=settings.AWS_REGION,
-)
+# Initialize S3 client only if credentials are available
+s3_client = None
+if settings.AWS_ACCESS_KEY_ID and settings.AWS_SECRET_ACCESS_KEY and settings.AWS_BUCKET_NAME:
+    try:
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_REGION,
+        )
+    except Exception as e:
+        print(f"Warning: Could not initialize S3 client: {e}")
+        s3_client = None
 
 allowed_content_types = [
     "image/jpeg",
@@ -31,6 +38,14 @@ allowed_content_types = [
 async def upload_file(_: CurrentUser, file: UploadFile = File(...)):
     if file.content_type not in allowed_content_types:
         raise HTTPException(status_code=400, detail="Invalid file type")
+    
+    # Check if S3 is configured
+    if not s3_client:
+        raise HTTPException(
+            status_code=503, 
+            detail="File upload service not configured. Please use direct image upload in forms."
+        )
+    
     try:
         file_content = await file.read()
         key = str(uuid.uuid4())

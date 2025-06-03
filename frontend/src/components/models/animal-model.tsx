@@ -113,8 +113,8 @@ export function AnimalForm(props: {
           species: "",
           image: "",
           max_daily_checkouts: 1,
-          max_daily_checkout_hours: 0,
-          rest_time: 0,
+          max_daily_checkout_hours: undefined,
+          rest_time: undefined,
           description: "",
           tier: "1",
           handling_enabled: false,
@@ -147,24 +147,36 @@ export function AnimalForm(props: {
     // Create FormData
     const formData = new FormData();
 
-    // Append fields with proper type handling for FastAPI
+    // Append required fields
     formData.append("name", values.name);
     formData.append("species", values.species);
     formData.append("max_daily_checkouts", values.max_daily_checkouts.toString());
-    if (values.max_daily_checkout_hours !== undefined && values.max_daily_checkout_hours !== null) {
-      formData.append("max_daily_checkout_hours", values.max_daily_checkout_hours.toString());
-    }
-    formData.append("rest_time", (values.rest_time || 0).toString());
     formData.append("handling_enabled", values.handling_enabled.toString());
     formData.append("zoo_id", values.zoo_id);
     formData.append("tier", values.tier);
+    
+    // Only append optional fields if they have meaningful values
+    if (values.max_daily_checkout_hours !== undefined && values.max_daily_checkout_hours !== null && values.max_daily_checkout_hours > 0) {
+      formData.append("max_daily_checkout_hours", values.max_daily_checkout_hours.toString());
+    }
+    
+    if (values.rest_time !== undefined && values.rest_time !== null && values.rest_time > 0) {
+      formData.append("rest_time", values.rest_time.toString());
+    }
+    
     if (values.description && values.description.trim()) {
-      formData.append("description", values.description);
+      formData.append("description", values.description.trim());
     }
 
     // Append the image file if selected
     if (image) {
       formData.append("image", image);
+    }
+
+    // Debug: Log what we're sending
+    console.log("FormData contents:");
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
     }
 
     // Determine endpoint and ID
@@ -173,19 +185,17 @@ export function AnimalForm(props: {
     try {
         let res;
         if (props.mode === "add") {
-            res = await createAnimal(formData); // Call createAnimal without animalId
+            res = await createAnimal(formData);
         } else {
-            // animalId is guaranteed to be a string here because props.mode === "edit"
-            if (!animalId) { // Add a type guard just in case
+            if (!animalId) {
               toast.error("Animal ID is missing for update.");
               return;
             }
-            res = await updateAnimal(formData, animalId); // Call updateAnimal with animalId
+            res = await updateAnimal(formData, animalId);
         }
 
         if (res.status === 200) {
-            // Assuming success response structure is consistent
-            toast.success(res.data.message || "Animal saved successfully!"); // Use a default message if needed
+            toast.success(res.data.message || "Animal saved successfully!");
             queryClient.invalidateQueries(["animals"]);
 
             if (props.mode === "edit") {
@@ -194,11 +204,24 @@ export function AnimalForm(props: {
             }
 
             props.setOpen(false);
-            form.reset(); // Reset form after successful submission
-            setImage(null); // Clear selected image
+            form.reset();
+            setImage(null);
         } else {
-            // Handle potential error structure differences
-            toast.error(res.data.detail || "An error occurred.");
+            console.error("Error response:", res);
+            // Handle validation errors properly
+            if (res.status === 422 && res.data?.detail) {
+                if (Array.isArray(res.data.detail)) {
+                    // Pydantic validation errors
+                    const errorMessages = res.data.detail.map((err: any) => 
+                        `${err.loc?.join(' → ') || 'Field'}: ${err.msg}`
+                    ).join('\n');
+                    toast.error(`Validation Error:\n${errorMessages}`);
+                } else {
+                    toast.error(res.data.detail);
+                }
+            } else {
+                toast.error(res.data?.detail || "An error occurred.");
+            }
         }
     } catch (error) {
         console.error("Error submitting animal form:", error);

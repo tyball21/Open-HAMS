@@ -20,7 +20,7 @@ export const animalSchema = z.object({
   max_daily_checkouts: z.number().int().positive(),
   rest_time: z.preprocess(
     (val) => (val === '' || val == null ? 0 : Number(val)),
-    z.number().nonnegative("Must be 0 or positive")
+    z.number().nonnegative("Must be 0 or positive").optional()
   ),
   tier: z.string({ message: "Tier is required" }),
   zoo_id: z.string({ message: "Zoo is required" }),

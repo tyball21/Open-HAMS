@@ -4,9 +4,6 @@ import { API_URL } from "./utils";
 const instance = axios.create({
   baseURL: API_URL,
   timeout: 40000,
-  headers: {
-    "Content-Type": "application/json",
-  },
   timeoutErrorMessage: "Request timed out",
   validateStatus(code) {
     return true;
@@ -18,6 +15,13 @@ instance.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // Only set Content-Type to application/json if we're not sending FormData
+  // Let axios automatically set the Content-Type for FormData requests
+  if (!(config.data instanceof FormData)) {
+    config.headers["Content-Type"] = "application/json";
+  }
+  
   return config;
 });
 

@@ -11,12 +11,12 @@ import instance from "./axios";
 import { AnimalHealthLogSchema, AnimalSchema } from "./schemas/animal";
 
 export async function getAnimals() {
-  const res = await instance.get("/animals");
+  const res = await instance.get("/animals/");
   return res.data as Animal[];
 }
 
 export async function createAnimal(formData: FormData) {
-  const res = await instance.post("/animals", formData);
+  const res = await instance.post("/animals/", formData);
   return res;
 }
 

@@ -234,10 +234,18 @@ export function EditEventForm({
               name="event_type_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Type</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    Event Type
+                    {eventTypes && eventTypes.length === 0 && (
+                      <span className="text-xs text-amber-600 font-medium">
+                        ⚠️ No event types available
+                      </span>
+                    )}
+                  </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={eventTypes && eventTypes.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger className="w-40">
@@ -245,14 +253,30 @@ export function EditEventForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {eventTypes?.map((eventType) => (
-                        <SelectItem
-                          key={eventType.id}
-                          value={eventType.id.toString()}
-                        >
-                          {eventType.name}
-                        </SelectItem>
-                      ))}
+                      {eventTypes && eventTypes.length === 0 ? (
+                        <div className="p-4 text-center max-w-xs">
+                          <div className="text-amber-600 mb-2">⚠️</div>
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            No event types exist yet
+                          </p>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Event types must be created by an administrator before you can create events.
+                          </p>
+                          <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded border">
+                            <p className="font-medium mb-1">For Admins:</p>
+                            <p>Go to Settings → Admin → Event Types to create event types</p>
+                          </div>
+                        </div>
+                      ) : (
+                        eventTypes?.map((eventType) => (
+                          <SelectItem
+                            key={eventType.id}
+                            value={eventType.id.toString()}
+                          >
+                            {eventType.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

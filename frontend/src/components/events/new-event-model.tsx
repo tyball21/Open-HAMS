@@ -18,6 +18,7 @@ import {
   useHandlers,
   useZoos,
 } from "@/api/queries";
+import { API_URL } from "@/api/utils";
 import {
   EventSchema,
   eventSchema,
@@ -286,7 +287,10 @@ export function NewEventCard({
                     toRender: (
                       <>
                         <Avatar className="size-5">
-                          <AvatarImage src={animal_info.animal.image ? `/static/animal_images/${animal_info.animal.image}` : undefined} />
+                          <AvatarImage src={(() => {
+                            const imageField = (animal_info.animal as any)["image_filename"] || (animal_info.animal as any)["image"];
+                            return imageField ? `${API_URL}/static/animal_images/${imageField}` : undefined;
+                          })()} />
                           <AvatarFallback>
                             {getInitials(animal_info.animal.name)}
                           </AvatarFallback>
@@ -321,12 +325,18 @@ export function NewEventCard({
                     );
                     return (
                       <AvatarWithTooltip
-                        src={animal?.animal.image ? `/static/animal_images/${animal.animal.image}` : ""}
+                        src={(() => {
+                          const imageField = (animal?.animal as any)?.["image_filename"] || (animal?.animal as any)?.["image"];
+                          return imageField ? `${API_URL}/static/animal_images/${imageField}` : "";
+                        })()}
                         name={animal?.animal.name}
                       >
                         <div className="flex items-center gap-2">
                           <Avatar className="size-8">
-                            <AvatarImage src={animal?.animal.image ? `/static/animal_images/${animal.animal.image}` : undefined} />
+                            <AvatarImage src={(() => {
+                              const imageField = (animal?.animal as any)?.["image_filename"] || (animal?.animal as any)?.["image"];
+                              return imageField ? `${API_URL}/static/animal_images/${imageField}` : undefined;
+                            })()} />
                             <AvatarFallback>
                               {getInitials(animal?.animal.name!)}
                             </AvatarFallback>
@@ -375,10 +385,18 @@ export function NewEventCard({
               name="event_type_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Type</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    Event Type
+                    {eventTypes && eventTypes.length === 0 && (
+                      <span className="text-xs text-amber-600 font-medium">
+                        ⚠️ No event types available
+                      </span>
+                    )}
+                  </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value as any as string}
+                    disabled={eventTypes && eventTypes.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger className="w-40">
@@ -391,13 +409,18 @@ export function NewEventCard({
                     </FormControl>
                     <SelectContent>
                       {eventTypes && eventTypes.length === 0 ? (
-                        <div className="p-3 text-center">
-                          <p className="text-sm text-muted-foreground mb-2">
-                            No event types exist yet.
+                        <div className="p-4 text-center max-w-xs">
+                          <div className="text-amber-600 mb-2">⚠️</div>
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            No event types exist yet
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            Go to Settings → Admin → Event Types to create one
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Event types must be created by an administrator before you can create events.
                           </p>
+                          <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded border">
+                            <p className="font-medium mb-1">For Admins:</p>
+                            <p>Go to Settings → Admin → Event Types to create event types</p>
+                          </div>
                         </div>
                       ) : (
                         eventTypes?.map((eventType: EventType) => (

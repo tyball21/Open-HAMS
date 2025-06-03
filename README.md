@@ -15,6 +15,25 @@ For detailed installation and usage instructions, please refer to the README fil
 - [Frontend Installation](./frontend/README.md)
 - [Backend Installation](./backend/README.md)
 
+## Development and Testing
+
+### Backend Diagnostic Tests
+
+The backend includes diagnostic tests to help debug common issues:
+
+- **Database Schema Validation**: Verify database schema matches expectations
+- **Animal Model Tests**: Test animal creation and validation logic
+- **422 Error Debugging**: Tools to diagnose "Unprocessable Entity" errors
+
+Run tests from the backend directory:
+```bash
+cd backend
+python tests/test_database_schema.py
+python tests/test_animal_model.py
+```
+
+See [Backend Tests README](./backend/tests/README.md) for detailed information.
+
 ## Technologies Used
 
 ### Frontend
