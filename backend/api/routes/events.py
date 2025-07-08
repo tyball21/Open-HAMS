@@ -156,8 +156,12 @@ async def create_event(
 
     # validate checkouts if checkout_immediately
     if body.checkout_immediately:
-        await validate_tiers(animals, current_user)
-        await validate_animals_availability(body.animal_ids, session)
+        # Only validate for immediate checkout if the event is starting now,
+        # not for future events that are set to auto-checkout.
+        now = datetime.now(UTC)
+        if not body.event.start_at > now:
+            await validate_tiers(animals, current_user)
+            await validate_animals_availability(body.animal_ids, session)
 
     event = Event(**body.event.model_dump())
     session.add(event)

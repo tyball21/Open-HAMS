@@ -124,7 +124,7 @@ async def get_feed(session: AsyncSession = Depends(get_db_session)) -> list[Feed
         event = FeedEvent(
             name=item.animal.name,
             description=snake_to_capital_case(item.action),
-            image=item.animal.image,
+            image=item.animal.image_filename,
             logged_at=item.changed_at,
             by=f"{item.user.first_name} {item.user.last_name}",
         )
