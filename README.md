@@ -15,6 +15,46 @@ For detailed installation and usage instructions, please refer to the README fil
 - [Frontend Installation](./frontend/README.md)
 - [Backend Installation](./backend/README.md)
 
+## Production Deployment
+
+### Frontend Deployment (React + Vite)
+
+#### Build Commands
+```bash
+# Install dependencies
+pnpm install
+
+# Build for production
+pnpm run build
+```
+
+#### Deployment Options
+
+**Option 1: Static Hosting (Vercel, Netlify, etc.)**
+- Deploy the `dist/` folder to your static hosting provider
+- Most providers will auto-detect Vite projects and handle the build process
+
+**Option 2: Self-Hosted with Static Server**
+```bash
+# After building, serve with a static file server
+npx serve -s dist
+```
+
+**Option 3: Render Web Service**
+- Build Command: `pnpm install && pnpm run build`
+- Start Command: `npx serve -s dist`
+- Publish Directory: `dist`
+
+#### Local Production Preview
+```bash
+# Preview the production build locally
+pnpm run preview
+```
+
+### Backend Deployment
+
+Refer to the [Backend README](./backend/README.md) for production deployment instructions.
+
 ## Development and Testing
 
 ### Backend Diagnostic Tests
